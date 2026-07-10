@@ -21,6 +21,10 @@ from structlog.types import Processor
 
 from app.core.config import settings
 
+# Marks the handler this module installs so re-configuration can replace it
+# without disturbing handlers owned by other frameworks (e.g. pytest).
+_APP_HANDLER_MARKER = "_automl_app_handler"
+
 
 def _shared_processors() -> list[Processor]:
     """Processors applied to both structlog and stdlib log records."""
@@ -66,9 +70,14 @@ def configure_logging() -> None:
 
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(formatter)
+    setattr(handler, _APP_HANDLER_MARKER, True)
 
     root = logging.getLogger()
-    root.handlers.clear()
+    # Remove only *our* previously-installed handler so re-configuring is
+    # idempotent, while preserving foreign handlers (e.g. pytest's log capture).
+    for existing in list(root.handlers):
+        if getattr(existing, _APP_HANDLER_MARKER, False):
+            root.removeHandler(existing)
     root.addHandler(handler)
     root.setLevel(settings.LOG_LEVEL.upper())
 

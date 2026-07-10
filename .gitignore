@@ -1,0 +1,111 @@
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# Test / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+nosetests.xml
+
+# ---------------------------------------------------------------------------
+# Environment / secrets
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# ---------------------------------------------------------------------------
+# Machine Learning artifacts
+# ---------------------------------------------------------------------------
+mlruns/
+mlartifacts/
+.mlflow/
+*.pkl
+*.joblib
+*.onnx
+*.model
+artifacts/
+storage/
+!storage/.gitkeep
+
+# DVC
+/data
+.dvc/cache
+.dvc/tmp
+
+# ---------------------------------------------------------------------------
+# Node / Frontend
+# ---------------------------------------------------------------------------
+node_modules/
+.pnp
+.pnp.js
+dist-ssr/
+*.local
+.vite/
+.turbo/
+coverage/
+playwright-report/
+test-results/
+.next/
+
+# ---------------------------------------------------------------------------
+# IDE / OS
+# ---------------------------------------------------------------------------
+.idea/
+.vscode/
+!.vscode/extensions.json
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+*.log
+logs/
+
+# ---------------------------------------------------------------------------
+# Docker / infra
+# ---------------------------------------------------------------------------
+*.pid
+docker-compose.override.yml
+
+# ---------------------------------------------------------------------------
+# Docs
+# ---------------------------------------------------------------------------
+site/

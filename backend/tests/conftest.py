@@ -1,0 +1,116 @@
+"""Shared pytest fixtures.
+
+Every test runs against a fresh in-memory SQLite database created from the ORM
+metadata, so the suite is fast, hermetic and requires no external services. A
+``StaticPool`` keeps the single in-memory connection alive across sessions so the
+test client and helper fixtures observe the same data. The application's
+``get_db_session`` dependency is overridden to use this database.
+"""
+
+from __future__ import annotations
+
+import uuid
+from collections.abc import AsyncGenerator
+
+import pytest
+import pytest_asyncio
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
+from sqlalchemy.pool import StaticPool
+
+from app.db.base import Base
+from app.db.seed import seed_roles, seed_superuser
+from app.db.session import get_db_session
+from app.main import create_app
+
+TEST_SUPERUSER_EMAIL = "admin@example.com"
+TEST_SUPERUSER_PASSWORD = "Admin12345!"
+
+
+@pytest_asyncio.fixture
+async def engine() -> AsyncGenerator[AsyncEngine, None]:
+    """Provide an in-memory SQLite engine with the full schema created."""
+    engine = create_async_engine(
+        "sqlite+aiosqlite://",
+        poolclass=StaticPool,
+        connect_args={"check_same_thread": False},
+    )
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield engine
+    await engine.dispose()
+
+
+@pytest_asyncio.fixture
+async def session_factory(engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
+    """Provide a session factory bound to the test engine."""
+    return async_sessionmaker(engine, expire_on_commit=False, autoflush=False)
+
+
+@pytest_asyncio.fixture
+async def db_session(
+    session_factory: async_sessionmaker[AsyncSession],
+) -> AsyncGenerator[AsyncSession, None]:
+    """Provide a session for direct data setup/assertions inside tests."""
+    async with session_factory() as session:
+        yield session
+
+
+@pytest_asyncio.fixture
+async def seeded(session_factory: async_sessionmaker[AsyncSession]) -> None:
+    """Seed default RBAC roles/permissions before a test runs."""
+    async with session_factory() as session:
+        await seed_roles(session)
+        await session.commit()
+
+
+@pytest_asyncio.fixture
+async def client(
+    engine: AsyncEngine,
+    session_factory: async_sessionmaker[AsyncSession],
+) -> AsyncGenerator[AsyncClient, None]:
+    """Provide an httpx client wired to the app with an overridden DB session."""
+    app = create_app()
+
+    async def _override_get_db() -> AsyncGenerator[AsyncSession, None]:
+        async with session_factory() as session:
+            try:
+                yield session
+                await session.commit()
+            except Exception:
+                await session.rollback()
+                raise
+
+    app.dependency_overrides[get_db_session] = _override_get_db
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://testserver") as http_client:
+        yield http_client
+
+    app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture
+async def superuser(
+    session_factory: async_sessionmaker[AsyncSession],
+) -> dict[str, str]:
+    """Seed a superuser and return its credentials."""
+    async with session_factory() as session:
+        await seed_superuser(
+            session,
+            email=TEST_SUPERUSER_EMAIL,
+            password=TEST_SUPERUSER_PASSWORD,
+        )
+        await session.commit()
+    return {"email": TEST_SUPERUSER_EMAIL, "password": TEST_SUPERUSER_PASSWORD}
+
+
+@pytest.fixture
+def unique_email() -> str:
+    """Return a unique email address for registration tests."""
+    return f"user-{uuid.uuid4().hex[:12]}@example.com"

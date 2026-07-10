@@ -22,7 +22,7 @@ from pydantic import (
     computed_field,
     field_validator,
 )
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 Environment = Literal["local", "development", "staging", "production", "test"]
 
@@ -64,8 +64,10 @@ class Settings(BaseSettings):
     PASSWORD_MIN_LENGTH: int = 8
 
     # --- CORS ------------------------------------------------------------
-    BACKEND_CORS_ORIGINS: Annotated[list[AnyHttpUrl], Field(default_factory=list)]
-    ALLOWED_HOSTS: Annotated[list[str], Field(default_factory=lambda: ["*"])]
+    # ``NoDecode`` disables pydantic-settings' implicit JSON decoding so the
+    # ``_split_csv`` validator can accept a plain comma-separated string.
+    BACKEND_CORS_ORIGINS: Annotated[list[AnyHttpUrl], NoDecode, Field(default_factory=list)]
+    ALLOWED_HOSTS: Annotated[list[str], NoDecode, Field(default_factory=lambda: ["*"])]
 
     # --- Database --------------------------------------------------------
     POSTGRES_SERVER: str = "localhost"

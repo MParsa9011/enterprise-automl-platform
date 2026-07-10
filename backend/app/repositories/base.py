@@ -125,8 +125,18 @@ class BaseRepository(Generic[ModelT]):
         attr = getattr(self.model, name, None)
         return attr if isinstance(attr, InstrumentedAttribute) else None
 
+    def _base_conditions(self) -> list[Any]:
+        """Conditions applied to *every* generated read query.
+
+        Override in subclasses to enforce invariants such as excluding
+        soft-deleted rows, so callers can never accidentally read them.
+        """
+        return []
+
     def _apply_filters(self, stmt: Select[Any], filters: dict[str, Any]) -> Select[Any]:
-        """Add equality ``WHERE`` clauses for each recognised filter key."""
+        """Add base conditions and equality ``WHERE`` clauses for each filter."""
+        for condition in self._base_conditions():
+            stmt = stmt.where(condition)
         for key, value in filters.items():
             column = self._column(key)
             if column is not None and value is not None:

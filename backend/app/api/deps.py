@@ -19,9 +19,11 @@ from app.core.exceptions import AuthenticationError, PermissionDeniedError
 from app.core.security import TokenType, decode_token
 from app.db.session import get_db_session
 from app.models.user import User
+from app.repositories.project import ProjectRepository
 from app.repositories.refresh_token import RefreshTokenRepository
 from app.repositories.user import RoleRepository, UserRepository
 from app.services.auth import AuthService
+from app.services.project import ProjectService
 
 DbSession = Annotated[AsyncSession, Depends(get_db_session)]
 
@@ -49,9 +51,15 @@ def get_refresh_token_repository(db: DbSession) -> RefreshTokenRepository:
     return RefreshTokenRepository(db)
 
 
+def get_project_repository(db: DbSession) -> ProjectRepository:
+    """Provide a :class:`ProjectRepository` bound to the request session."""
+    return ProjectRepository(db)
+
+
 UserRepo = Annotated[UserRepository, Depends(get_user_repository)]
 RoleRepo = Annotated[RoleRepository, Depends(get_role_repository)]
 RefreshTokenRepo = Annotated[RefreshTokenRepository, Depends(get_refresh_token_repository)]
+ProjectRepo = Annotated[ProjectRepository, Depends(get_project_repository)]
 
 
 # ---------------------------------------------------------------------------
@@ -67,6 +75,14 @@ def get_auth_service(
 
 
 AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]
+
+
+def get_project_service(projects: ProjectRepo) -> ProjectService:
+    """Provide a :class:`ProjectService`."""
+    return ProjectService(projects)
+
+
+ProjectServiceDep = Annotated[ProjectService, Depends(get_project_service)]
 
 
 # ---------------------------------------------------------------------------

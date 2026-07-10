@@ -10,6 +10,7 @@ clients while still being logged with full context server-side.
 from __future__ import annotations
 
 from fastapi import FastAPI, Request, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -26,7 +27,27 @@ def _render(request: Request, status_code: int, detail: ErrorDetail) -> JSONResp
     """Serialise an error into the standard envelope with the request id."""
     request_id = getattr(request.state, "request_id", None)
     payload = ErrorResponse(error=detail, request_id=request_id)
-    return JSONResponse(status_code=status_code, content=payload.model_dump())
+    return JSONResponse(status_code=status_code, content=jsonable_encoder(payload))
+
+
+def _safe_validation_errors(errors: list[dict[str, object]]) -> list[dict[str, object]]:
+    """Return JSON-safe validation errors.
+
+    Pydantic embeds the originating exception in each error's ``ctx`` (e.g.
+    ``ctx={"error": ValueError(...)}``), which is not JSON-serialisable. We
+    stringify ``ctx`` values and normalise ``loc`` to a plain list so the payload
+    can be rendered without leaking non-serialisable objects.
+    """
+    cleaned: list[dict[str, object]] = []
+    for error in errors:
+        item = dict(error)
+        if isinstance(item.get("loc"), tuple):
+            item["loc"] = list(item["loc"])  # type: ignore[arg-type]
+        ctx = item.get("ctx")
+        if isinstance(ctx, dict):
+            item["ctx"] = {key: str(value) for key, value in ctx.items()}
+        cleaned.append(item)
+    return cleaned
 
 
 def register_exception_handlers(app: FastAPI) -> None:
@@ -58,7 +79,7 @@ def register_exception_handlers(app: FastAPI) -> None:
             ErrorDetail(
                 code="validation_error",
                 message="Request validation failed.",
-                details=exc.errors(),
+                details=_safe_validation_errors(exc.errors()),
             ),
         )
 

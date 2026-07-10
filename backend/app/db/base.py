@@ -13,6 +13,7 @@ from app.db.base_class import Base
 # Model imports are for their side effect (table registration) only; new models
 # must be added here so Alembic autogeneration sees them.
 from app.models.permission import Permission  # noqa: F401, E402
+from app.models.project import Project  # noqa: F401, E402
 from app.models.refresh_token import RefreshToken  # noqa: F401, E402
 from app.models.role import Role  # noqa: F401, E402
 from app.models.user import User  # noqa: F401, E402

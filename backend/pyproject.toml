@@ -1,0 +1,188 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "automl-platform"
+version = "0.1.0"
+description = "Enterprise AutoML Platform — backend API and training engine"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Enterprise AutoML Platform Team" }]
+keywords = ["automl", "machine-learning", "fastapi", "mlops"]
+
+dependencies = [
+    # --- Web framework / ASGI ---
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "gunicorn>=23.0.0",
+    "python-multipart>=0.0.12",
+
+    # --- Configuration / validation ---
+    "pydantic>=2.9.0",
+    "pydantic-settings>=2.6.0",
+    "email-validator>=2.2.0",
+
+    # --- Database ---
+    "sqlalchemy[asyncio]>=2.0.36",
+    "asyncpg>=0.30.0",
+    "psycopg[binary]>=3.2.0",
+    "alembic>=1.14.0",
+
+    # --- Cache / queue ---
+    "redis>=5.2.0",
+    "celery[redis]>=5.4.0",
+    "flower>=2.0.0",
+
+    # --- Security ---
+    "passlib[bcrypt]>=1.7.4",
+    "bcrypt>=4.2.0",
+    "pyjwt[crypto]>=2.10.0",
+    "python-jose[cryptography]>=3.3.0",
+
+    # --- Observability ---
+    "structlog>=24.4.0",
+    "prometheus-client>=0.21.0",
+
+    # --- Utilities ---
+    "tenacity>=9.0.0",
+    "httpx>=0.28.0",
+    "orjson>=3.10.0",
+]
+
+[project.optional-dependencies]
+ml = [
+    "pandas>=2.2.0",
+    "numpy>=2.1.0",
+    "scikit-learn>=1.5.0",
+    "scipy>=1.14.0",
+    "xgboost>=2.1.0",
+    "lightgbm>=4.5.0",
+    "catboost>=1.2.7",
+    "optuna>=4.1.0",
+    "shap>=0.46.0",
+    "mlflow>=2.18.0",
+    "dvc>=3.56.0",
+    "openpyxl>=3.1.5",
+    "plotly>=5.24.0",
+    "matplotlib>=3.9.0",
+    "joblib>=1.4.0",
+]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.24.0",
+    "pytest-cov>=6.0.0",
+    "pytest-mock>=3.14.0",
+    "coverage[toml]>=7.6.0",
+    "ruff>=0.8.0",
+    "black>=24.10.0",
+    "mypy>=1.13.0",
+    "types-python-jose>=3.3.4",
+    "types-passlib>=1.7.7",
+    "faker>=30.0.0",
+    "aiosqlite>=0.20.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+# ---------------------------------------------------------------------------
+# Ruff — linting & import sorting
+# ---------------------------------------------------------------------------
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["app", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "SIM",  # flake8-simplify
+    "TID",  # flake8-tidy-imports
+    "RUF",  # ruff-specific
+]
+ignore = [
+    "B008",  # do not perform function calls in argument defaults (FastAPI Depends)
+    "N818",  # exception naming
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "N802"]
+"alembic/*" = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+# ---------------------------------------------------------------------------
+# Black — formatting
+# ---------------------------------------------------------------------------
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+# ---------------------------------------------------------------------------
+# mypy — static typing
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+plugins = ["pydantic.mypy"]
+exclude = ["alembic/", "tests/"]
+
+[[tool.mypy.overrides]]
+module = [
+    "catboost.*",
+    "lightgbm.*",
+    "xgboost.*",
+    "shap.*",
+    "optuna.*",
+    "mlflow.*",
+    "sklearn.*",
+    "plotly.*",
+    "joblib.*",
+]
+ignore_missing_imports = true
+
+# ---------------------------------------------------------------------------
+# Pytest
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = [
+    "unit: fast isolated unit tests",
+    "integration: tests that touch the database or external services",
+    "ml: tests that exercise ML training paths (slow)",
+]
+
+# ---------------------------------------------------------------------------
+# Coverage
+# ---------------------------------------------------------------------------
+[tool.coverage.run]
+source = ["app"]
+branch = true
+omit = ["app/main.py", "*/migrations/*", "alembic/*"]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]

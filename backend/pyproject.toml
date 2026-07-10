@@ -36,10 +36,10 @@ dependencies = [
     "flower>=2.0.0",
 
     # --- Security ---
-    "passlib[bcrypt]>=1.7.4",
+    # bcrypt is used directly (no passlib) to avoid its bcrypt>=4.1 version-probe
+    # warnings and to keep the hashing interface small and explicit.
     "bcrypt>=4.2.0",
     "pyjwt[crypto]>=2.10.0",
-    "python-jose[cryptography]>=3.3.0",
 
     # --- Observability ---
     "structlog>=24.4.0",
@@ -78,8 +78,6 @@ dev = [
     "ruff>=0.8.0",
     "black>=24.10.0",
     "mypy>=1.13.0",
-    "types-python-jose>=3.3.4",
-    "types-passlib>=1.7.7",
     "faker>=30.0.0",
     "aiosqlite>=0.20.0",
 ]

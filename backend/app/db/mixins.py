@@ -11,16 +11,20 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, func
-from sqlalchemy.dialects.postgresql import UUID as PGUUID
+from sqlalchemy import DateTime, Uuid, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 
 class UUIDPrimaryKeyMixin:
-    """Adds a server-generated UUID primary key."""
+    """Adds a UUID primary key.
+
+    Uses SQLAlchemy's dialect-aware :class:`~sqlalchemy.Uuid` type, which maps to
+    a native ``UUID`` column on PostgreSQL and a portable ``CHAR(32)`` elsewhere
+    (e.g. the SQLite database used in the test suite).
+    """
 
     id: Mapped[uuid.UUID] = mapped_column(
-        PGUUID(as_uuid=True),
+        Uuid(as_uuid=True),
         primary_key=True,
         default=uuid.uuid4,
         index=True,

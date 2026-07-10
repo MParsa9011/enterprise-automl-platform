@@ -86,11 +86,15 @@ ROLES: tuple[RoleSpec, ...] = (
     ),
     RoleSpec(
         name=Role.DATA_SCIENTIST,
-        description="Build datasets, run experiments and deploy models.",
+        description="Build and manage own workspaces, run experiments, deploy models.",
         permissions=frozenset(
             _READ_ONLY
             | {
+                # Full lifecycle over resources the user owns (ownership is
+                # enforced per-instance in the service layer).
                 "project:create",
+                "project:update",
+                "project:delete",
                 "dataset:create",
                 "dataset:delete",
                 "experiment:create",

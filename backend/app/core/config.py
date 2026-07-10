@@ -62,6 +62,10 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 14  # 14 days
     JWT_ALGORITHM: str = "HS256"
     PASSWORD_MIN_LENGTH: int = 8
+    # Role granted to self-registered users. On a self-serve ML platform this is
+    # a builder role so new users can create their own workspace; read-only
+    # collaborators are assigned the "viewer" role by an administrator.
+    DEFAULT_USER_ROLE: str = "data_scientist"
 
     # --- CORS ------------------------------------------------------------
     # ``NoDecode`` disables pydantic-settings' implicit JSON decoding so the

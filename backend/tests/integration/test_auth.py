@@ -28,8 +28,8 @@ class TestRegistration:
         assert body["user"]["email"] == unique_email
         assert body["tokens"]["access_token"]
         assert body["tokens"]["token_type"] == "bearer"
-        # Default role assigned.
-        assert any(r["name"] == "viewer" for r in body["user"]["roles"])
+        # Default builder role assigned on self-registration.
+        assert any(r["name"] == "data_scientist" for r in body["user"]["roles"])
 
     async def test_duplicate_email_conflicts(
         self, client: AsyncClient, seeded: None, unique_email: str

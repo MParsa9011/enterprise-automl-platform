@@ -21,7 +21,6 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
 from app.core.config import settings
-from app.core.constants import Role as RoleName
 from app.core.exceptions import AuthenticationError, ConflictError
 from app.core.logging import get_logger
 from app.core.security import (
@@ -82,7 +81,7 @@ class AuthService:
             full_name=data.full_name,
             is_active=True,
         )
-        default_role = await self._roles.get_by_name(RoleName.VIEWER)
+        default_role = await self._roles.get_by_name(settings.DEFAULT_USER_ROLE)
         if default_role is not None:
             user.roles.append(default_role)
 

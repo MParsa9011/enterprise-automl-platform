@@ -8,6 +8,7 @@ Autogeneration compares the live schema against ``Base.metadata``.
 
 from __future__ import annotations
 
+import os
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config, pool
@@ -23,8 +24,11 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Inject the runtime database URL from application settings.
-config.set_main_option("sqlalchemy.url", settings.sync_database_uri)
+# The database URL defaults to the application's sync (psycopg) DSN, but can be
+# overridden via ``ALEMBIC_DATABASE_URL`` — useful for autogenerating against a
+# throwaway SQLite database in environments without a running Postgres.
+database_url = os.getenv("ALEMBIC_DATABASE_URL") or settings.sync_database_uri
+config.set_main_option("sqlalchemy.url", database_url)
 
 target_metadata = Base.metadata
 

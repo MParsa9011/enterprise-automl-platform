@@ -67,11 +67,15 @@ _SKLEARN_SCORING = {
 }
 
 
-def _scoring_for(primary_metric: str, n_classes: int) -> str:
-    """Map a primary metric to an sklearn scoring string for CV/HPO."""
+def sklearn_scoring(primary_metric: str, n_classes: int) -> str:
+    """Map a primary metric to an sklearn scoring string for CV/HPO/importance."""
     if primary_metric == "roc_auc" and n_classes > 2:
         return "roc_auc_ovr_weighted"
     return _SKLEARN_SCORING.get(primary_metric, "accuracy")
+
+
+# Backwards-compatible private alias used within this module.
+_scoring_for = sklearn_scoring
 
 
 def train_algorithm(

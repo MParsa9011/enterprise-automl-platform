@@ -11,13 +11,13 @@ Thanks for using the Enterprise AutoML Platform! Here's how to get help.
 
 ## 💬 Questions & discussion
 
-- Open a [GitHub Discussion](https://github.com/your-org/enterprise-automl-platform/discussions)
+- Open a [GitHub Discussion](https://github.com/MParsa9011/enterprise-automl-platform/discussions)
   for usage questions, ideas and general help.
 
 ## 🐛 Bugs & features
 
-- File a [bug report](https://github.com/your-org/enterprise-automl-platform/issues/new?template=bug_report.yml)
-  or a [feature request](https://github.com/your-org/enterprise-automl-platform/issues/new?template=feature_request.yml).
+- File a [bug report](https://github.com/MParsa9011/enterprise-automl-platform/issues/new?template=bug_report.yml)
+  or a [feature request](https://github.com/MParsa9011/enterprise-automl-platform/issues/new?template=feature_request.yml).
 - Please search existing issues first to avoid duplicates.
 
 ## 🔒 Security

@@ -12,7 +12,7 @@
 **Please do not open a public issue for security vulnerabilities.**
 
 Instead, report them privately via GitHub's
-[private vulnerability reporting](https://github.com/your-org/enterprise-automl-platform/security/advisories/new)
+[private vulnerability reporting](https://github.com/MParsa9011/enterprise-automl-platform/security/advisories/new)
 (Security → Advisories → *Report a vulnerability*), or email the maintainers.
 
 Please include:

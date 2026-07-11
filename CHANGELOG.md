@@ -68,5 +68,5 @@ First public release. A complete, production-grade full-stack AutoML platform.
 - 84 backend tests and frontend unit/component tests pass; the full flow was
   verified end-to-end against a live PostgreSQL database.
 
-[Unreleased]: https://github.com/your-org/enterprise-automl-platform/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/your-org/enterprise-automl-platform/releases/tag/v1.0.0
+[Unreleased]: https://github.com/MParsa9011/enterprise-automl-platform/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/MParsa9011/enterprise-automl-platform/releases/tag/v1.0.0

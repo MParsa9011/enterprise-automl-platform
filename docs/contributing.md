@@ -1,7 +1,7 @@
 # Contributing
 
 The full contributor guide lives at the repository root:
-**[CONTRIBUTING.md](https://github.com/your-org/enterprise-automl-platform/blob/main/CONTRIBUTING.md)**.
+**[CONTRIBUTING.md](https://github.com/MParsa9011/enterprise-automl-platform/blob/main/CONTRIBUTING.md)**.
 
 In brief:
 
@@ -16,5 +16,5 @@ In brief:
 5. Open a pull request using the provided template; CI runs backend, frontend and
    docs checks.
 
-Please also review the [Code of Conduct](https://github.com/your-org/enterprise-automl-platform/blob/main/CODE_OF_CONDUCT.md)
-and report security issues per the [Security Policy](https://github.com/your-org/enterprise-automl-platform/blob/main/SECURITY.md).
+Please also review the [Code of Conduct](https://github.com/MParsa9011/enterprise-automl-platform/blob/main/CODE_OF_CONDUCT.md)
+and report security issues per the [Security Policy](https://github.com/MParsa9011/enterprise-automl-platform/blob/main/SECURITY.md).

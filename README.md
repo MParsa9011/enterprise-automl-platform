@@ -6,9 +6,9 @@
 explain them → deploy → serve predictions.** A production-grade, full-stack
 automated machine learning platform.
 
-[![Backend CI](https://github.com/your-org/enterprise-automl-platform/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/your-org/enterprise-automl-platform/actions/workflows/backend-ci.yml)
-[![Frontend CI](https://github.com/your-org/enterprise-automl-platform/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/your-org/enterprise-automl-platform/actions/workflows/frontend-ci.yml)
-[![Docs CI](https://github.com/your-org/enterprise-automl-platform/actions/workflows/docs-ci.yml/badge.svg)](https://github.com/your-org/enterprise-automl-platform/actions/workflows/docs-ci.yml)
+[![Backend CI](https://github.com/MParsa9011/enterprise-automl-platform/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/MParsa9011/enterprise-automl-platform/actions/workflows/backend-ci.yml)
+[![Frontend CI](https://github.com/MParsa9011/enterprise-automl-platform/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/MParsa9011/enterprise-automl-platform/actions/workflows/frontend-ci.yml)
+[![Docs CI](https://github.com/MParsa9011/enterprise-automl-platform/actions/workflows/docs-ci.yml/badge.svg)](https://github.com/MParsa9011/enterprise-automl-platform/actions/workflows/docs-ci.yml)
 <br/>
 [![Python](https://img.shields.io/badge/Python-3.12+-3776AB?logo=python&logoColor=white)](backend/pyproject.toml)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.139-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
@@ -277,8 +277,8 @@ Distributed under the **MIT License**. See [LICENSE](LICENSE).
 
 ## 👤 Author
 
-Built as a portfolio-grade, production-quality reference implementation.
-Replace `your-org` in the badge/links with your GitHub org or username.
+Built as a portfolio-grade, production-quality reference implementation by
+[@MParsa9011](https://github.com/MParsa9011).
 
 ## 🙏 Acknowledgements
 

@@ -1,6 +1,6 @@
 site_name: Enterprise AutoML Platform
 site_description: Production-grade AutoML platform — documentation
-repo_url: https://github.com/your-org/automl-platform
+repo_url: https://github.com/MParsa9011/enterprise-automl-platform
 edit_uri: ""
 
 theme:

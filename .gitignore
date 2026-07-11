@@ -8,12 +8,9 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
 parts/
 sdist/
 var/
@@ -80,6 +77,9 @@ node_modules/
 .pnp
 .pnp.js
 dist-ssr/
+/frontend/dist/
+/backend/dist/
+/backend/build/
 *.local
 .vite/
 .turbo/

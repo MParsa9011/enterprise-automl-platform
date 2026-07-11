@@ -54,7 +54,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: Environment = "local"
     DEBUG: bool = False
     API_V1_PREFIX: str = "/api/v1"
-    VERSION: str = "0.1.0"
+    VERSION: str = "1.0.0"
 
     # --- Security --------------------------------------------------------
     SECRET_KEY: str = Field(default_factory=lambda: secrets.token_urlsafe(64))

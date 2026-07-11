@@ -62,9 +62,11 @@ mlartifacts/
 *.joblib
 *.onnx
 *.model
-artifacts/
-storage/
-!storage/.gitkeep
+# Runtime artifact/object storage roots (NOT the app/storage source package).
+/artifacts/
+/storage/
+/backend/storage/
+/backend/artifacts/
 
 # DVC
 /data

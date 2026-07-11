@@ -18,11 +18,15 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from app import __version__
 from app.api.errors import register_exception_handlers
-from app.api.middleware import RequestContextMiddleware, SecurityHeadersMiddleware
+from app.api.middleware import (
+    AuditLogMiddleware,
+    RequestContextMiddleware,
+    SecurityHeadersMiddleware,
+)
 from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.logging import configure_logging, get_logger
-from app.db.session import dispose_engine
+from app.db.session import AsyncSessionFactory, dispose_engine
 
 logger = get_logger(__name__)
 
@@ -59,6 +63,10 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
+    # Session factory used by session-less components (e.g. audit middleware);
+    # overridable in tests via ``app.state``.
+    app.state.session_factory = AsyncSessionFactory
+
     _register_middleware(app)
     register_exception_handlers(app)
 
@@ -79,6 +87,9 @@ def create_app() -> FastAPI:
 def _register_middleware(app: FastAPI) -> None:
     """Register middleware in the correct order (last added runs first)."""
     app.add_middleware(RequestContextMiddleware)
+    # Added after RequestContext so it wraps it and can read the request id, but
+    # still runs inside the security/CORS layers.
+    app.add_middleware(AuditLogMiddleware)
     app.add_middleware(SecurityHeadersMiddleware, hsts=settings.is_production)
 
     if settings.cors_origins:

@@ -21,15 +21,22 @@ from app.core.exceptions import AuthenticationError, PermissionDeniedError
 from app.core.security import TokenType, decode_token
 from app.db.session import get_db_session
 from app.models.user import User
+from app.repositories.audit import AuditLogRepository
 from app.repositories.dataset import DatasetRepository, DatasetVersionRepository
 from app.repositories.experiment import ExperimentRepository, RunRepository
+from app.repositories.model import ModelRepository
+from app.repositories.notification import NotificationRepository
 from app.repositories.project import ProjectRepository
 from app.repositories.refresh_token import RefreshTokenRepository
 from app.repositories.user import RoleRepository, UserRepository
+from app.services.audit import AuditService
 from app.services.auth import AuthService
 from app.services.dataset import DatasetService
 from app.services.eda import EdaService
 from app.services.experiment import ExperimentService
+from app.services.model import ModelService
+from app.services.notification import NotificationService
+from app.services.prediction import PredictionService
 from app.services.project import ProjectService
 from app.storage import LocalStorage, Storage
 
@@ -84,6 +91,21 @@ def get_run_repository(db: DbSession) -> RunRepository:
     return RunRepository(db)
 
 
+def get_model_repository(db: DbSession) -> ModelRepository:
+    """Provide a :class:`ModelRepository` bound to the request session."""
+    return ModelRepository(db)
+
+
+def get_notification_repository(db: DbSession) -> NotificationRepository:
+    """Provide a :class:`NotificationRepository` bound to the request session."""
+    return NotificationRepository(db)
+
+
+def get_audit_repository(db: DbSession) -> AuditLogRepository:
+    """Provide an :class:`AuditLogRepository` bound to the request session."""
+    return AuditLogRepository(db)
+
+
 UserRepo = Annotated[UserRepository, Depends(get_user_repository)]
 RoleRepo = Annotated[RoleRepository, Depends(get_role_repository)]
 RefreshTokenRepo = Annotated[RefreshTokenRepository, Depends(get_refresh_token_repository)]
@@ -92,6 +114,9 @@ DatasetRepo = Annotated[DatasetRepository, Depends(get_dataset_repository)]
 DatasetVersionRepo = Annotated[DatasetVersionRepository, Depends(get_dataset_version_repository)]
 ExperimentRepo = Annotated[ExperimentRepository, Depends(get_experiment_repository)]
 RunRepo = Annotated[RunRepository, Depends(get_run_repository)]
+ModelRepo = Annotated[ModelRepository, Depends(get_model_repository)]
+NotificationRepo = Annotated[NotificationRepository, Depends(get_notification_repository)]
+AuditRepo = Annotated[AuditLogRepository, Depends(get_audit_repository)]
 
 
 # ---------------------------------------------------------------------------
@@ -168,6 +193,46 @@ def get_experiment_service(
 
 
 ExperimentServiceDep = Annotated[ExperimentService, Depends(get_experiment_service)]
+
+
+def get_notification_service(notifications: NotificationRepo) -> NotificationService:
+    """Provide a :class:`NotificationService`."""
+    return NotificationService(notifications)
+
+
+NotificationServiceDep = Annotated[NotificationService, Depends(get_notification_service)]
+
+
+def get_model_service(
+    models: ModelRepo,
+    runs: RunRepo,
+    experiments: ExperimentRepo,
+    projects: ProjectServiceDep,
+    notifications: NotificationServiceDep,
+) -> ModelService:
+    """Provide a fully-wired :class:`ModelService`."""
+    return ModelService(models, runs, experiments, projects, notifications)
+
+
+ModelServiceDep = Annotated[ModelService, Depends(get_model_service)]
+
+
+def get_prediction_service(
+    models: ModelRepo, projects: ProjectServiceDep, storage: StorageDep
+) -> PredictionService:
+    """Provide a :class:`PredictionService`."""
+    return PredictionService(models, projects, storage)
+
+
+PredictionServiceDep = Annotated[PredictionService, Depends(get_prediction_service)]
+
+
+def get_audit_service(audit_logs: AuditRepo) -> AuditService:
+    """Provide an :class:`AuditService`."""
+    return AuditService(audit_logs)
+
+
+AuditServiceDep = Annotated[AuditService, Depends(get_audit_service)]
 
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,126 @@
+# =============================================================================
+# Enterprise AutoML Platform — full local/production-like stack.
+#
+#   docker compose up -d --build
+#
+# Services: Postgres, Redis, MLflow, API (FastAPI), Celery worker, frontend
+# (Nginx). The API container runs migrations and seeding on start-up.
+# =============================================================================
+
+name: automl-platform
+
+x-backend-env: &backend-env
+  ENVIRONMENT: ${ENVIRONMENT:-production}
+  SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env}
+  POSTGRES_SERVER: db
+  POSTGRES_PORT: 5432
+  POSTGRES_USER: ${POSTGRES_USER:-automl}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-automl}
+  POSTGRES_DB: ${POSTGRES_DB:-automl}
+  REDIS_HOST: redis
+  REDIS_PORT: 6379
+  BACKEND_CORS_ORIGINS: ${BACKEND_CORS_ORIGINS:-http://localhost:8080}
+  FIRST_SUPERUSER_EMAIL: ${FIRST_SUPERUSER_EMAIL:-admin@automl.local}
+  FIRST_SUPERUSER_PASSWORD: ${FIRST_SUPERUSER_PASSWORD:-ChangeMe123!}
+  STORAGE_ROOT: /data/storage
+  MLFLOW_ENABLED: ${MLFLOW_ENABLED:-true}
+  MLFLOW_TRACKING_URI: http://mlflow:5000
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-automl}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-automl}
+      POSTGRES_DB: ${POSTGRES_DB:-automl}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-automl} -d ${POSTGRES_DB:-automl}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  mlflow:
+    build:
+      context: ./backend
+    entrypoint: [""]
+    user: root
+    command:
+      - mlflow
+      - server
+      - --host=0.0.0.0
+      - --port=5000
+      - --backend-store-uri=sqlite:////mlflow/mlflow.db
+      - --default-artifact-root=/mlflow/artifacts
+    volumes:
+      - mlflow_data:/mlflow
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./backend
+    environment:
+      <<: *backend-env
+    volumes:
+      - app_storage:/data/storage
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: ./backend
+    entrypoint: ["scripts/worker-entrypoint.sh"]
+    command:
+      - celery
+      - -A
+      - app.worker.celery_app
+      - worker
+      - --loglevel=info
+      - --concurrency=2
+    environment:
+      <<: *backend-env
+    volumes:
+      - app_storage:/data/storage
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  mlflow_data:
+  app_storage:

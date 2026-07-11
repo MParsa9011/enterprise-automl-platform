@@ -14,7 +14,10 @@ before the next begins; the project stays runnable throughout.
 | M6 | AutoML training engine (Celery, Optuna, MLflow) | ✅ Done |
 | M7 | Model registry, prediction API, notifications, audit logs | ✅ Done |
 | M8 | Frontend admin dashboard (React + TS + Tailwind) | ✅ Done |
-| M9 | DevOps, CI/CD, docs, migrations & deployment | ⏳ In progress |
+| M9 | DevOps, CI/CD, docs, migrations & deployment | ✅ Done |
+
+> **All milestones complete.** The platform is fully implemented, tested,
+> containerised, documented and CI-gated.
 
 ## Milestone detail
 

@@ -6,12 +6,14 @@ _Last updated: 2026-07-11_
 
 | Metric | Value |
 |--------|-------|
-| Current milestone | **M9 — DevOps, CI/CD, docs & deployment** (starting) |
-| Completed milestones | M1–M8 |
-| Backend tests | 82 passing |
-| Frontend tests | 5 passing (build + typecheck clean) |
-| Python | 3.12+ (dev venv on 3.13) |
-| Node | 26 |
+| Status | **✅ All milestones complete (M1–M9)** |
+| Backend tests | 82 passing · ruff / black / mypy clean |
+| Frontend tests | 5 passing · typecheck / eslint / build clean |
+| Migrations | Initial schema applies & rolls back |
+| Docs | MkDocs site builds `--strict` |
+| Containers | Backend + frontend Dockerfiles, full compose stack |
+| CI | Backend, frontend and docs GitHub Actions |
+| Python / Node | 3.12+ / 22+ |
 | Runnable | ✅ API boots; frontend renders; suites green |
 
 ## Completed
@@ -82,6 +84,17 @@ _Last updated: 2026-07-11_
 - Loading/error/empty states throughout; Vitest unit + component tests.
 - `npm run build`, `tsc --noEmit`, and `vitest` all pass; verified rendering in
   light and dark themes.
+
+### M9 — DevOps, CI/CD, docs & deployment
+- Initial Alembic migration for the full 14-table schema; `ALEMBIC_DATABASE_URL`
+  override; DB-readiness waiter, idempotent init/seed CLI, container entrypoints.
+- Multi-stage backend Dockerfile (libgomp1 for boosting libs, non-root) and
+  frontend Dockerfile (Vite build → Nginx reverse proxy).
+- `docker-compose.yml`: Postgres, Redis, MLflow, API, Celery worker, frontend.
+- GitHub Actions: backend (ruff/black/mypy/pytest + Postgres migration apply),
+  frontend (typecheck/eslint/vitest/build), docs (mkdocs `--strict`).
+- MkDocs site: architecture + ER (Mermaid) diagrams, install/deploy/dev/API guides.
+- Backend fully lint/format/type-clean; pragmatic mypy config for the ML layer.
 
 ### Testing infrastructure
 - Test suite runs on a file-backed SQLite database so components that open their

@@ -202,6 +202,20 @@ class ExperimentService:
         artifact_key = f"models/{experiment.project_id}/{experiment.id}/{run.id}.joblib"
         await self._storage.save(artifact_key, result.artifact)
 
+        # Best-effort MLflow logging (no-op unless explicitly enabled).
+        from app.ml.tracking import log_run
+
+        await anyio.to_thread.run_sync(
+            partial(
+                log_run,
+                experiment_name=experiment.name,
+                run_name=f"{algorithm_key}-{run.id}",
+                algorithm=algorithm_key,
+                params=result.params,
+                metrics=result.metrics,
+            )
+        )
+
         return await self._runs.update(
             run,
             status=RunStatus.COMPLETED,

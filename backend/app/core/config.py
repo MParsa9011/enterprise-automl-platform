@@ -102,6 +102,8 @@ class Settings(BaseSettings):
     STORAGE_ROOT: str = "./storage"
     MAX_UPLOAD_SIZE_MB: int = 512
     MLFLOW_TRACKING_URI: str = "http://localhost:5000"
+    # MLflow logging is opt-in so a missing tracking server never stalls training.
+    MLFLOW_ENABLED: bool = False
 
     # --- Pagination ------------------------------------------------------
     DEFAULT_PAGE_SIZE: int = 20

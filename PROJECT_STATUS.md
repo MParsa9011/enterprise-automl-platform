@@ -6,6 +6,7 @@ _Last updated: 2026-07-11_
 
 | Metric | Value |
 |--------|-------|
+| Release | **v1.0.0 — GitHub-ready** |
 | Status | **✅ All milestones complete (M1–M9)** |
 | Backend tests | 82 passing · ruff / black / mypy clean |
 | Frontend tests | 5 passing · typecheck / eslint / build clean |
@@ -100,6 +101,16 @@ _Last updated: 2026-07-11_
 - Test suite runs on a file-backed SQLite database so components that open their
   own session (audit middleware) get an independent connection, mirroring the
   production connection pool.
+
+### Release readiness (v1.0.0)
+- Professional open-source README with badges; MkDocs docs (architecture, backend,
+  frontend, deployment, API, coding standards) build under `--strict`.
+- Community health files: LICENSE (MIT), CODE_OF_CONDUCT, SECURITY, SUPPORT,
+  CONTRIBUTING, issue forms, PR template, FUNDING and Dependabot.
+- CHANGELOG and RELEASE_NOTES prepared; version bumped to 1.0.0 across backend,
+  frontend and config.
+- CI covers backend, frontend, docs and tagged releases.
+- No secrets committed (only `.env.example` templates); local DBs/artifacts ignored.
 
 ## Architecture notes
 - Clean Architecture: `api → services → repositories → models`, with `schemas`

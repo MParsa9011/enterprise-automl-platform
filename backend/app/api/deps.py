@@ -22,12 +22,14 @@ from app.core.security import TokenType, decode_token
 from app.db.session import get_db_session
 from app.models.user import User
 from app.repositories.dataset import DatasetRepository, DatasetVersionRepository
+from app.repositories.experiment import ExperimentRepository, RunRepository
 from app.repositories.project import ProjectRepository
 from app.repositories.refresh_token import RefreshTokenRepository
 from app.repositories.user import RoleRepository, UserRepository
 from app.services.auth import AuthService
 from app.services.dataset import DatasetService
 from app.services.eda import EdaService
+from app.services.experiment import ExperimentService
 from app.services.project import ProjectService
 from app.storage import LocalStorage, Storage
 
@@ -72,12 +74,24 @@ def get_dataset_version_repository(db: DbSession) -> DatasetVersionRepository:
     return DatasetVersionRepository(db)
 
 
+def get_experiment_repository(db: DbSession) -> ExperimentRepository:
+    """Provide an :class:`ExperimentRepository` bound to the request session."""
+    return ExperimentRepository(db)
+
+
+def get_run_repository(db: DbSession) -> RunRepository:
+    """Provide a :class:`RunRepository` bound to the request session."""
+    return RunRepository(db)
+
+
 UserRepo = Annotated[UserRepository, Depends(get_user_repository)]
 RoleRepo = Annotated[RoleRepository, Depends(get_role_repository)]
 RefreshTokenRepo = Annotated[RefreshTokenRepository, Depends(get_refresh_token_repository)]
 ProjectRepo = Annotated[ProjectRepository, Depends(get_project_repository)]
 DatasetRepo = Annotated[DatasetRepository, Depends(get_dataset_repository)]
 DatasetVersionRepo = Annotated[DatasetVersionRepository, Depends(get_dataset_version_repository)]
+ExperimentRepo = Annotated[ExperimentRepository, Depends(get_experiment_repository)]
+RunRepo = Annotated[RunRepository, Depends(get_run_repository)]
 
 
 # ---------------------------------------------------------------------------
@@ -139,6 +153,21 @@ def get_eda_service(datasets: DatasetServiceDep) -> EdaService:
 
 
 EdaServiceDep = Annotated[EdaService, Depends(get_eda_service)]
+
+
+def get_experiment_service(
+    experiments: ExperimentRepo,
+    runs: RunRepo,
+    dataset_versions: DatasetVersionRepo,
+    datasets: DatasetServiceDep,
+    projects: ProjectServiceDep,
+    storage: StorageDep,
+) -> ExperimentService:
+    """Provide a fully-wired :class:`ExperimentService`."""
+    return ExperimentService(experiments, runs, dataset_versions, datasets, projects, storage)
+
+
+ExperimentServiceDep = Annotated[ExperimentService, Depends(get_experiment_service)]
 
 
 # ---------------------------------------------------------------------------

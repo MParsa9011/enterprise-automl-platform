@@ -14,6 +14,7 @@ from app.schemas.experiment import (
     ExperimentDetail,
     ExperimentRead,
     RunDetail,
+    RunExplanation,
     RunRead,
 )
 from app.schemas.pagination import Page, PageParams
@@ -112,3 +113,19 @@ async def get_run(
     """Return a single run including its evaluation figures."""
     run = await service.get_run(actor, experiment_id, run_id)
     return RunDetail.model_validate(run)
+
+
+@router.get(
+    "/experiments/{experiment_id}/runs/{run_id}/explain",
+    response_model=RunExplanation,
+    summary="Explain a run (permutation & SHAP importance)",
+)
+async def explain_run(
+    experiment_id: uuid.UUID,
+    run_id: uuid.UUID,
+    actor: ExperimentReader,
+    service: ExperimentServiceDep,
+) -> RunExplanation:
+    """Return permutation feature importance and, when available, SHAP values."""
+    explanation = await service.explain_run(actor, experiment_id, run_id)
+    return RunExplanation.model_validate(explanation)

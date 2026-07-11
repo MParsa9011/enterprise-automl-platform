@@ -93,3 +93,11 @@ class ExperimentDetail(ExperimentRead):
     """Experiment including its runs."""
 
     runs: list[RunRead] = Field(default_factory=list)
+
+
+class RunExplanation(Schema):
+    """Explainability payload for a trained run."""
+
+    permutation_importance: dict[str, Any]
+    shap: dict[str, Any] | None = None
+

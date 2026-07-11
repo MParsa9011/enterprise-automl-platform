@@ -251,6 +251,36 @@ class ExperimentService:
             raise NotFoundError("Run not found.")
         return run
 
+    async def explain_run(
+        self, actor: User, experiment_id: uuid.UUID, run_id: uuid.UUID
+    ) -> dict[str, object]:
+        """Compute permutation (and, when available, SHAP) importances for a run."""
+        from app.ml.explain import explain
+        from app.ml.training import load_model, sklearn_scoring
+
+        experiment = await self.get(actor, experiment_id)
+        run = await self.get_run(actor, experiment_id, run_id)
+        if run.status != RunStatus.COMPLETED or not run.artifact_key:
+            raise UnprocessableEntityError("Run has no trained model to explain.")
+
+        artifact = await self._storage.read(run.artifact_key)
+        frame = await self._load_dataframe(experiment)
+        model = await anyio.to_thread.run_sync(load_model, artifact)
+        scoring = sklearn_scoring(experiment.primary_metric, len(run.class_names or []))
+
+        return await anyio.to_thread.run_sync(
+            partial(
+                explain,
+                model,
+                frame,
+                task_type=TaskType(experiment.task_type),
+                target=experiment.target_column or "",
+                class_names=run.class_names,
+                scoring=scoring,
+                random_state=experiment.random_state,
+            )
+        )
+
     # ------------------------------------------------------------------
     # Helpers
     # ------------------------------------------------------------------

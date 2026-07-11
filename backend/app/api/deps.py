@@ -9,21 +9,26 @@ every collaborator overridable in tests via ``app.dependency_overrides``.
 from __future__ import annotations
 
 from collections.abc import Callable, Coroutine
+from functools import lru_cache
 from typing import Annotated, Any
 
 from fastapi import Depends, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.core.exceptions import AuthenticationError, PermissionDeniedError
 from app.core.security import TokenType, decode_token
 from app.db.session import get_db_session
 from app.models.user import User
+from app.repositories.dataset import DatasetRepository, DatasetVersionRepository
 from app.repositories.project import ProjectRepository
 from app.repositories.refresh_token import RefreshTokenRepository
 from app.repositories.user import RoleRepository, UserRepository
 from app.services.auth import AuthService
+from app.services.dataset import DatasetService
 from app.services.project import ProjectService
+from app.storage import LocalStorage, Storage
 
 DbSession = Annotated[AsyncSession, Depends(get_db_session)]
 
@@ -56,10 +61,39 @@ def get_project_repository(db: DbSession) -> ProjectRepository:
     return ProjectRepository(db)
 
 
+def get_dataset_repository(db: DbSession) -> DatasetRepository:
+    """Provide a :class:`DatasetRepository` bound to the request session."""
+    return DatasetRepository(db)
+
+
+def get_dataset_version_repository(db: DbSession) -> DatasetVersionRepository:
+    """Provide a :class:`DatasetVersionRepository` bound to the request session."""
+    return DatasetVersionRepository(db)
+
+
 UserRepo = Annotated[UserRepository, Depends(get_user_repository)]
 RoleRepo = Annotated[RoleRepository, Depends(get_role_repository)]
 RefreshTokenRepo = Annotated[RefreshTokenRepository, Depends(get_refresh_token_repository)]
 ProjectRepo = Annotated[ProjectRepository, Depends(get_project_repository)]
+DatasetRepo = Annotated[DatasetRepository, Depends(get_dataset_repository)]
+DatasetVersionRepo = Annotated[DatasetVersionRepository, Depends(get_dataset_version_repository)]
+
+
+# ---------------------------------------------------------------------------
+# Infrastructure providers
+# ---------------------------------------------------------------------------
+@lru_cache
+def _storage_singleton() -> Storage:
+    """Build the process-wide storage backend once."""
+    return LocalStorage(settings.STORAGE_ROOT)
+
+
+def get_storage() -> Storage:
+    """Provide the configured object-storage backend."""
+    return _storage_singleton()
+
+
+StorageDep = Annotated[Storage, Depends(get_storage)]
 
 
 # ---------------------------------------------------------------------------
@@ -83,6 +117,19 @@ def get_project_service(projects: ProjectRepo) -> ProjectService:
 
 
 ProjectServiceDep = Annotated[ProjectService, Depends(get_project_service)]
+
+
+def get_dataset_service(
+    datasets: DatasetRepo,
+    versions: DatasetVersionRepo,
+    storage: StorageDep,
+    projects: ProjectServiceDep,
+) -> DatasetService:
+    """Provide a fully-wired :class:`DatasetService`."""
+    return DatasetService(datasets, versions, storage, projects)
+
+
+DatasetServiceDep = Annotated[DatasetService, Depends(get_dataset_service)]
 
 
 # ---------------------------------------------------------------------------

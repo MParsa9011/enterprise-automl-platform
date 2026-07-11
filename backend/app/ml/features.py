@@ -205,7 +205,7 @@ def preview_features(frame: pd.DataFrame, config: FeatureConfig) -> dict[str, An
 
     try:
         names = [str(n) for n in pipeline.get_feature_names_out()]
-    except Exception:  # noqa: BLE001 - PCA/selection may not expose names
+    except Exception:
         names = [f"feature_{i}" for i in range(transformed.shape[1])]
 
     sample = transformed[:10].tolist()

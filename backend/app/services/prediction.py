@@ -17,9 +17,9 @@ import pandas as pd
 
 from app.core.constants import TaskType
 from app.core.exceptions import UnprocessableEntityError
+from app.ml.training import load_model
 from app.models.model import Model
 from app.models.user import User
-from app.ml.training import load_model
 from app.repositories.model import ModelRepository
 from app.schemas.prediction import PredictionItem, PredictionResponse
 from app.services.project import ProjectService
@@ -52,9 +52,7 @@ class PredictionService:
         artifact = await self._storage.read(model.artifact_key)
         pipeline = await anyio.to_thread.run_sync(load_model, artifact)
 
-        predictions = await anyio.to_thread.run_sync(
-            partial(self._run, pipeline, frame, model)
-        )
+        predictions = await anyio.to_thread.run_sync(partial(self._run, pipeline, frame, model))
         return PredictionResponse(
             model_id=str(model.id),
             model_version=model.version,
@@ -74,11 +72,7 @@ class PredictionService:
 
         if task_type == TaskType.CLASSIFICATION:
             labels = [PredictionService._decode_label(v, class_names) for v in raw]
-            proba = (
-                pipeline.predict_proba(frame)
-                if hasattr(pipeline, "predict_proba")
-                else None
-            )
+            proba = pipeline.predict_proba(frame) if hasattr(pipeline, "predict_proba") else None
             items = []
             for i, label in enumerate(labels):
                 probabilities = None

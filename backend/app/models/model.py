@@ -70,7 +70,7 @@ class Model(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
         ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
 
-    project: Mapped["Project"] = relationship(lazy="joined")
+    project: Mapped[Project] = relationship(lazy="joined")
 
     @property
     def is_deployed(self) -> bool:

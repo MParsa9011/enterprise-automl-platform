@@ -43,4 +43,4 @@ class NotificationRepository(BaseRepository[Notification]):
             .values(read_at=datetime.now(UTC))
         )
         result = await self.session.execute(stmt)
-        return int(result.rowcount or 0)
+        return int(result.rowcount or 0)  # type: ignore[attr-defined]

@@ -55,7 +55,7 @@ def _safe_import(module_name: str) -> ModuleType | None:
     """
     try:
         return importlib.import_module(module_name)
-    except Exception as exc:  # noqa: BLE001 - optional dependency, any failure is fine
+    except Exception as exc:
         logger.warning("optional_library_unavailable", module=module_name, error=str(exc))
         return None
 
@@ -92,7 +92,7 @@ def _build(clf: type, reg: type) -> EstimatorFactory:
 # ---------------------------------------------------------------------------
 # Search spaces
 # ---------------------------------------------------------------------------
-def _forest_space(trial: "optuna.Trial", _: TaskType) -> dict[str, Any]:
+def _forest_space(trial: optuna.Trial, _: TaskType) -> dict[str, Any]:
     return {
         "n_estimators": trial.suggest_int("n_estimators", 100, 500, step=50),
         "max_depth": trial.suggest_int("max_depth", 3, 20),
@@ -102,7 +102,7 @@ def _forest_space(trial: "optuna.Trial", _: TaskType) -> dict[str, Any]:
     }
 
 
-def _gboost_space(trial: "optuna.Trial", _: TaskType) -> dict[str, Any]:
+def _gboost_space(trial: optuna.Trial, _: TaskType) -> dict[str, Any]:
     return {
         "n_estimators": trial.suggest_int("n_estimators", 100, 400, step=50),
         "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.3, log=True),
@@ -111,13 +111,13 @@ def _gboost_space(trial: "optuna.Trial", _: TaskType) -> dict[str, Any]:
     }
 
 
-def _linear_space(trial: "optuna.Trial", task_type: TaskType) -> dict[str, Any]:
+def _linear_space(trial: optuna.Trial, task_type: TaskType) -> dict[str, Any]:
     if task_type == CLASSIFICATION:
         return {"C": trial.suggest_float("C", 1e-3, 1e2, log=True)}
     return {"alpha": trial.suggest_float("alpha", 1e-3, 1e2, log=True)}
 
 
-def _svm_space(trial: "optuna.Trial", _: TaskType) -> dict[str, Any]:
+def _svm_space(trial: optuna.Trial, _: TaskType) -> dict[str, Any]:
     return {
         "C": trial.suggest_float("C", 1e-2, 1e2, log=True),
         "kernel": trial.suggest_categorical("kernel", ["rbf", "linear"]),
@@ -125,14 +125,14 @@ def _svm_space(trial: "optuna.Trial", _: TaskType) -> dict[str, Any]:
     }
 
 
-def _knn_space(trial: "optuna.Trial", _: TaskType) -> dict[str, Any]:
+def _knn_space(trial: optuna.Trial, _: TaskType) -> dict[str, Any]:
     return {
         "n_neighbors": trial.suggest_int("n_neighbors", 3, 30),
         "weights": trial.suggest_categorical("weights", ["uniform", "distance"]),
     }
 
 
-def _tree_space(trial: "optuna.Trial", _: TaskType) -> dict[str, Any]:
+def _tree_space(trial: optuna.Trial, _: TaskType) -> dict[str, Any]:
     return {
         "max_depth": trial.suggest_int("max_depth", 2, 20),
         "min_samples_split": trial.suggest_int("min_samples_split", 2, 20),
@@ -140,11 +140,11 @@ def _tree_space(trial: "optuna.Trial", _: TaskType) -> dict[str, Any]:
     }
 
 
-def _nb_space(trial: "optuna.Trial", _: TaskType) -> dict[str, Any]:
+def _nb_space(trial: optuna.Trial, _: TaskType) -> dict[str, Any]:
     return {"var_smoothing": trial.suggest_float("var_smoothing", 1e-11, 1e-6, log=True)}
 
 
-def _boosting_space(trial: "optuna.Trial", _: TaskType) -> dict[str, Any]:
+def _boosting_space(trial: optuna.Trial, _: TaskType) -> dict[str, Any]:
     return {
         "n_estimators": trial.suggest_int("n_estimators", 100, 500, step=50),
         "max_depth": trial.suggest_int("max_depth", 2, 10),
@@ -172,33 +172,54 @@ def _build_registry() -> dict[str, AlgorithmSpec]:
     """Assemble the registry, including any available optional libraries."""
     specs: list[AlgorithmSpec] = [
         AlgorithmSpec(
-            "random_forest", "Random Forest", _BOTH,
-            _build(RandomForestClassifier, RandomForestRegressor), _forest_space,
+            "random_forest",
+            "Random Forest",
+            _BOTH,
+            _build(RandomForestClassifier, RandomForestRegressor),
+            _forest_space,
         ),
         AlgorithmSpec(
-            "extra_trees", "Extra Trees", _BOTH,
-            _build(ExtraTreesClassifier, ExtraTreesRegressor), _forest_space,
+            "extra_trees",
+            "Extra Trees",
+            _BOTH,
+            _build(ExtraTreesClassifier, ExtraTreesRegressor),
+            _forest_space,
         ),
         AlgorithmSpec(
-            "gradient_boosting", "Gradient Boosting", _BOTH,
-            _build(GradientBoostingClassifier, GradientBoostingRegressor), _gboost_space,
+            "gradient_boosting",
+            "Gradient Boosting",
+            _BOTH,
+            _build(GradientBoostingClassifier, GradientBoostingRegressor),
+            _gboost_space,
         ),
         AlgorithmSpec(
-            "logistic_regression", "Logistic / Linear Regression", _BOTH,
-            _build(LogisticRegression, Ridge), _linear_space,
+            "logistic_regression",
+            "Logistic / Linear Regression",
+            _BOTH,
+            _build(LogisticRegression, Ridge),
+            _linear_space,
         ),
         AlgorithmSpec("svm", "Support Vector Machine", _BOTH, _svc_factory, _svm_space),
         AlgorithmSpec(
-            "knn", "K-Nearest Neighbours", _BOTH,
-            _build(KNeighborsClassifier, KNeighborsRegressor), _knn_space,
+            "knn",
+            "K-Nearest Neighbours",
+            _BOTH,
+            _build(KNeighborsClassifier, KNeighborsRegressor),
+            _knn_space,
         ),
         AlgorithmSpec(
-            "decision_tree", "Decision Tree", _BOTH,
-            _build(DecisionTreeClassifier, DecisionTreeRegressor), _tree_space,
+            "decision_tree",
+            "Decision Tree",
+            _BOTH,
+            _build(DecisionTreeClassifier, DecisionTreeRegressor),
+            _tree_space,
         ),
         AlgorithmSpec(
-            "naive_bayes", "Gaussian Naive Bayes", _CLF_ONLY,
-            lambda _t, _r, params: GaussianNB(**params), _nb_space,
+            "naive_bayes",
+            "Gaussian Naive Bayes",
+            _CLF_ONLY,
+            lambda _t, _r, params: GaussianNB(**params),
+            _nb_space,
         ),
     ]
     specs.extend(_optional_boosting_specs())
@@ -212,21 +233,29 @@ def _optional_boosting_specs() -> list[AlgorithmSpec]:
     if (xgb := _safe_import("xgboost")) is not None:
         result.append(
             AlgorithmSpec(
-                "xgboost", "XGBoost", _BOTH,
-                _build(xgb.XGBClassifier, xgb.XGBRegressor), _boosting_space,
+                "xgboost",
+                "XGBoost",
+                _BOTH,
+                _build(xgb.XGBClassifier, xgb.XGBRegressor),
+                _boosting_space,
             )
         )
     if (lgb := _safe_import("lightgbm")) is not None:
         result.append(
             AlgorithmSpec(
-                "lightgbm", "LightGBM", _BOTH,
-                _lightgbm_factory(lgb), _boosting_space,
+                "lightgbm",
+                "LightGBM",
+                _BOTH,
+                _lightgbm_factory(lgb),
+                _boosting_space,
             )
         )
     if (cat := _safe_import("catboost")) is not None:
         result.append(
             AlgorithmSpec(
-                "catboost", "CatBoost", _BOTH,
+                "catboost",
+                "CatBoost",
+                _BOTH,
                 _catboost_factory(cat),
                 lambda trial, _t: {
                     "iterations": trial.suggest_int("iterations", 100, 500, step=50),

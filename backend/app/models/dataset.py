@@ -34,9 +34,7 @@ if TYPE_CHECKING:
 class Dataset(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     """A named, versioned tabular dataset within a project."""
 
-    __table_args__ = (
-        UniqueConstraint("project_id", "slug", name="uq_datasets_project_id_slug"),
-    )
+    __table_args__ = (UniqueConstraint("project_id", "slug", name="uq_datasets_project_id_slug"),)
 
     name: Mapped[str] = mapped_column(String(150), nullable=False, index=True)
     slug: Mapped[str] = mapped_column(String(160), nullable=False, index=True)
@@ -54,8 +52,8 @@ class Dataset(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     # Denormalised pointer to the highest version number for cheap listing.
     latest_version: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
-    project: Mapped["Project"] = relationship(lazy="joined")
-    versions: Mapped[list["DatasetVersion"]] = relationship(
+    project: Mapped[Project] = relationship(lazy="joined")
+    versions: Mapped[list[DatasetVersion]] = relationship(
         back_populates="dataset",
         cascade="all, delete-orphan",
         order_by="DatasetVersion.version.desc()",
@@ -93,7 +91,7 @@ class DatasetVersion(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     columns_schema: Mapped[list[dict[str, Any]]] = mapped_column(JSON, default=list)
     statistics: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
 
-    dataset: Mapped["Dataset"] = relationship(back_populates="versions")
+    dataset: Mapped[Dataset] = relationship(back_populates="versions")
 
     def __repr__(self) -> str:
         return f"<DatasetVersion dataset={self.dataset_id} v{self.version}>"

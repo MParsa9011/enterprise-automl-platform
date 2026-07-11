@@ -139,9 +139,7 @@ class AuthService:
             # Reuse of a rotated/revoked token is a strong compromise signal:
             # defensively revoke every session for the subject.
             await self._refresh_tokens.revoke_all_for_user(payload.user_id)
-            raise AuthenticationError(
-                "Refresh token is no longer valid.", code="refresh_invalid"
-            )
+            raise AuthenticationError("Refresh token is no longer valid.", code="refresh_invalid")
 
         user = await self._users.get(payload.user_id)
         if user is None or not user.is_active:
@@ -177,9 +175,7 @@ class AuthService:
     async def _issue_pair(self, user: User, client: ClientContext | None) -> TokenPair:
         """Issue a token pair and persist the refresh token for revocation."""
         pair, jti = create_token_pair(user.id, roles=sorted(user.role_names))
-        expires_at = datetime.now(UTC) + timedelta(
-            minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES
-        )
+        expires_at = datetime.now(UTC) + timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
         record = RefreshToken(
             jti=jti,
             user_id=user.id,

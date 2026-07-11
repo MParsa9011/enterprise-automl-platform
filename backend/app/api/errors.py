@@ -9,13 +9,15 @@ clients while still being logged with full context server-side.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+from typing import Any
+
 from fastapi import FastAPI, Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app.core.constants import REQUEST_ID_HEADER
 from app.core.exceptions import AppError
 from app.core.logging import get_logger
 from app.schemas.response import ErrorDetail, ErrorResponse
@@ -30,7 +32,7 @@ def _render(request: Request, status_code: int, detail: ErrorDetail) -> JSONResp
     return JSONResponse(status_code=status_code, content=jsonable_encoder(payload))
 
 
-def _safe_validation_errors(errors: list[dict[str, object]]) -> list[dict[str, object]]:
+def _safe_validation_errors(errors: Sequence[Any]) -> list[dict[str, Any]]:
     """Return JSON-safe validation errors.
 
     Pydantic embeds the originating exception in each error's ``ctx`` (e.g.
@@ -38,14 +40,15 @@ def _safe_validation_errors(errors: list[dict[str, object]]) -> list[dict[str, o
     stringify ``ctx`` values and normalise ``loc`` to a plain list so the payload
     can be rendered without leaking non-serialisable objects.
     """
-    cleaned: list[dict[str, object]] = []
+    cleaned: list[dict[str, Any]] = []
     for error in errors:
-        item = dict(error)
-        if isinstance(item.get("loc"), tuple):
-            item["loc"] = list(item["loc"])  # type: ignore[arg-type]
+        item: dict[str, Any] = dict(error)
+        loc = item.get("loc")
+        if isinstance(loc, tuple):
+            item["loc"] = list(loc)
         ctx = item.get("ctx")
         if isinstance(ctx, dict):
-            item["ctx"] = {key: str(value) for key, value in ctx.items()}
+            item["ctx"] = {str(key): str(value) for key, value in ctx.items()}
         cleaned.append(item)
     return cleaned
 
@@ -84,9 +87,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(StarletteHTTPException)
-    async def _handle_http_exception(
-        request: Request, exc: StarletteHTTPException
-    ) -> JSONResponse:
+    async def _handle_http_exception(request: Request, exc: StarletteHTTPException) -> JSONResponse:
         return _render(
             request,
             exc.status_code,

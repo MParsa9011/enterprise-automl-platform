@@ -29,9 +29,7 @@ class LocalStorage(Storage):
             raise ValueError(f"Refusing to access path outside storage root: {key!r}")
         return candidate
 
-    async def save(
-        self, key: str, data: bytes, *, content_type: str | None = None
-    ) -> StoredFile:
+    async def save(self, key: str, data: bytes, *, content_type: str | None = None) -> StoredFile:
         path = self._resolve(key)
         await anyio.to_thread.run_sync(lambda: path.parent.mkdir(parents=True, exist_ok=True))
         await anyio.to_thread.run_sync(path.write_bytes, data)

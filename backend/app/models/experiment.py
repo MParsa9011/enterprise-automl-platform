@@ -75,9 +75,9 @@ class Experiment(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
 
-    project: Mapped["Project"] = relationship(lazy="joined")
-    dataset: Mapped["Dataset"] = relationship(lazy="joined")
-    runs: Mapped[list["Run"]] = relationship(
+    project: Mapped[Project] = relationship(lazy="joined")
+    dataset: Mapped[Dataset] = relationship(lazy="joined")
+    runs: Mapped[list[Run]] = relationship(
         back_populates="experiment",
         cascade="all, delete-orphan",
         order_by="Run.created_at",
@@ -115,7 +115,7 @@ class Run(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     started_at: Mapped[datetime | None] = mapped_column(nullable=True)
     finished_at: Mapped[datetime | None] = mapped_column(nullable=True)
 
-    experiment: Mapped["Experiment"] = relationship(back_populates="runs")
+    experiment: Mapped[Experiment] = relationship(back_populates="runs")
 
     def __repr__(self) -> str:
         return f"<Run {self.algorithm} status={self.status} score={self.primary_score}>"

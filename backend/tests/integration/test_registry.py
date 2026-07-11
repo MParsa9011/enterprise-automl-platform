@@ -129,7 +129,9 @@ class TestPrediction:
         resp = await client.post(
             f"/api/v1/models/{model_id}/predict",
             headers=headers,
-            json={"records": [{"x1": 2.0, "x2": 1.0, "x3": 0.0}, {"x1": -2.0, "x2": -1.0, "x3": 0.0}]},
+            json={
+                "records": [{"x1": 2.0, "x2": 1.0, "x3": 0.0}, {"x1": -2.0, "x2": -1.0, "x3": 0.0}]
+            },
         )
         assert resp.status_code == 200, resp.text
         body = resp.json()

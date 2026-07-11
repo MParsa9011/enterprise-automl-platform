@@ -40,7 +40,7 @@ class RefreshToken(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     user_agent: Mapped[str | None] = mapped_column(String(400), nullable=True)
     ip_address: Mapped[str | None] = mapped_column(String(45), nullable=True)
 
-    user: Mapped["User"] = relationship(back_populates="refresh_tokens")
+    user: Mapped[User] = relationship(back_populates="refresh_tokens")
 
     @property
     def is_revoked(self) -> bool:

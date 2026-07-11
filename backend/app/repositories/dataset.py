@@ -44,9 +44,7 @@ class DatasetVersionRepository(BaseRepository[DatasetVersion]):
 
     model = DatasetVersion
 
-    async def get_for_dataset(
-        self, dataset_id: uuid.UUID, version: int
-    ) -> DatasetVersion | None:
+    async def get_for_dataset(self, dataset_id: uuid.UUID, version: int) -> DatasetVersion | None:
         """Return a specific version of a dataset, or ``None``."""
         stmt = select(DatasetVersion).where(
             DatasetVersion.dataset_id == dataset_id,

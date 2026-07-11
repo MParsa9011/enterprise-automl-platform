@@ -67,7 +67,9 @@ def missing_values_figure(frame: pd.DataFrame) -> dict[str, Any]:
 
 def histogram_figure(series: pd.Series, name: str) -> dict[str, Any]:
     """Distribution histogram for a numeric column."""
-    figure = go.Figure(go.Histogram(x=series.dropna().to_numpy().tolist(), marker_color=_PALETTE[0]))
+    figure = go.Figure(
+        go.Histogram(x=series.dropna().to_numpy().tolist(), marker_color=_PALETTE[0])
+    )
     figure.update_layout(
         title=f"Distribution — {name}",
         xaxis_title=name,
@@ -80,7 +82,9 @@ def histogram_figure(series: pd.Series, name: str) -> dict[str, Any]:
 
 def box_figure(series: pd.Series, name: str) -> dict[str, Any]:
     """Box plot for a numeric column (visualises spread and outliers)."""
-    figure = go.Figure(go.Box(y=series.dropna().to_numpy().tolist(), name=name, marker_color=_PALETTE[4]))
+    figure = go.Figure(
+        go.Box(y=series.dropna().to_numpy().tolist(), name=name, marker_color=_PALETTE[4])
+    )
     figure.update_layout(title=f"Box plot — {name}", template="plotly_white")
     return _fig_to_dict(figure)
 
@@ -133,9 +137,7 @@ def scatter_figure(frame: pd.DataFrame, x: str, y: str) -> dict[str, Any]:
             marker={"color": _PALETTE[0], "opacity": 0.6},
         )
     )
-    figure.update_layout(
-        title=f"{y} vs {x}", xaxis_title=x, yaxis_title=y, template="plotly_white"
-    )
+    figure.update_layout(title=f"{y} vs {x}", xaxis_title=x, yaxis_title=y, template="plotly_white")
     return _fig_to_dict(figure)
 
 

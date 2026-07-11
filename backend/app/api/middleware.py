@@ -81,7 +81,7 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
         if request.method in _AUDITED_METHODS and self._is_api(request):
             try:
                 await self._record(request, response)
-            except Exception:  # noqa: BLE001 - auditing must never break a request
+            except Exception:
                 logger.warning("audit_write_failed", path=request.url.path)
         return response
 
@@ -99,8 +99,10 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
         resource_type, resource_id = self._resource(request.url.path)
         user_id = self._user_id(request)
         forwarded = request.headers.get("x-forwarded-for")
-        ip = forwarded.split(",")[0].strip() if forwarded else (
-            request.client.host if request.client else None
+        ip = (
+            forwarded.split(",")[0].strip()
+            if forwarded
+            else (request.client.host if request.client else None)
         )
 
         async with session_factory() as session:
@@ -122,7 +124,7 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
     @staticmethod
     def _resource(path: str) -> tuple[str | None, str | None]:
         """Extract a resource type and optional id from the request path."""
-        parts = [segment for segment in path[len(_API_PREFIX):].split("/") if segment]
+        parts = [segment for segment in path[len(_API_PREFIX) :].split("/") if segment]
         if not parts:
             return None, None
         resource_type = parts[0]
@@ -142,7 +144,7 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
         try:
             payload = decode_token(header.split(" ", 1)[1], expected_type=TokenType.ACCESS)
             return payload.user_id
-        except Exception:  # noqa: BLE001 - unauthenticated/invalid tokens are fine
+        except Exception:
             return None
 
 

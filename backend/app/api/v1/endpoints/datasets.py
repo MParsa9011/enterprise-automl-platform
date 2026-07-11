@@ -137,9 +137,7 @@ async def download_version(
     return Response(
         content=content,
         media_type="application/octet-stream",
-        headers={
-            "Content-Disposition": f'attachment; filename="{record.original_filename}"'
-        },
+        headers={"Content-Disposition": f'attachment; filename="{record.original_filename}"'},
     )
 
 

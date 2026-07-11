@@ -50,7 +50,9 @@ class BaseRepository(Generic[ModelT]):
 
     async def exists(self, **filters: Any) -> bool:
         """Return whether any entity matches the equality ``filters``."""
-        stmt = self._apply_filters(select(self.model.id), filters).limit(1)
+        # Every concrete model carries ``id`` via UUIDPrimaryKeyMixin, which the
+        # ``Base``-bound TypeVar cannot express.
+        stmt = self._apply_filters(select(self.model.id), filters).limit(1)  # type: ignore[attr-defined]
         result = await self.session.execute(stmt)
         return result.first() is not None
 
@@ -115,7 +117,7 @@ class BaseRepository(Generic[ModelT]):
         """Bulk-delete by primary key, returning the number of rows removed."""
         stmt = delete(self.model).where(self.model.id == entity_id)  # type: ignore[attr-defined]
         result = await self.session.execute(stmt)
-        return int(result.rowcount or 0)
+        return int(result.rowcount or 0)  # type: ignore[attr-defined]
 
     # ------------------------------------------------------------------
     # Query construction helpers
@@ -125,11 +127,15 @@ class BaseRepository(Generic[ModelT]):
         attr = getattr(self.model, name, None)
         return attr if isinstance(attr, InstrumentedAttribute) else None
 
-    def _base_conditions(self) -> list[Any]:
+    def _base_conditions(self) -> Sequence[Any]:
         """Conditions applied to *every* generated read query.
 
         Override in subclasses to enforce invariants such as excluding
         soft-deleted rows, so callers can never accidentally read them.
+
+        (Annotated ``Sequence`` rather than ``list`` because this class also
+        defines a ``list`` method, which would shadow the builtin in a
+        PEP 563 string annotation.)
         """
         return []
 

@@ -142,7 +142,10 @@ class ModelService:
         await self._projects.get(actor, project_id)
         return await self._models.list(params, filters={"project_id": project_id})
 
-    async def compare(self, actor: User, model_ids: list[uuid.UUID]) -> list[Model]:
-        """Return several models for side-by-side comparison."""
-        models = [await self.get(actor, model_id) for model_id in model_ids]
-        return models
+    async def compare(self, actor: User, model_ids: Sequence[uuid.UUID]) -> Sequence[Model]:
+        """Return several models for side-by-side comparison.
+
+        Annotated ``Sequence`` (not ``list``) because this class defines a
+        ``list`` method that would otherwise shadow the builtin in annotations.
+        """
+        return [await self.get(actor, model_id) for model_id in model_ids]

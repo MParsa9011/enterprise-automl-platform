@@ -29,12 +29,12 @@ class Role(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     # System roles are seeded by the platform and cannot be deleted via the API.
     is_system: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
-    permissions: Mapped[list["Permission"]] = relationship(
+    permissions: Mapped[list[Permission]] = relationship(
         secondary=role_permissions,
         back_populates="roles",
         lazy="selectin",
     )
-    users: Mapped[list["User"]] = relationship(
+    users: Mapped[list[User]] = relationship(
         secondary=user_roles,
         back_populates="roles",
         lazy="selectin",

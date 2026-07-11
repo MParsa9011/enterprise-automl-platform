@@ -5,7 +5,7 @@ from __future__ import annotations
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Query, status
+from fastapi import APIRouter, Query
 
 from app.api.deps import CurrentUser, NotificationServiceDep
 from app.schemas.notification import NotificationQuery, NotificationRead, UnreadCount

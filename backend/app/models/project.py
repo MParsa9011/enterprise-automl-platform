@@ -38,7 +38,7 @@ class Project(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
         index=True,
         nullable=False,
     )
-    owner: Mapped["User"] = relationship(lazy="joined")
+    owner: Mapped[User] = relationship(lazy="joined")
 
     def __repr__(self) -> str:
         return f"<Project {self.slug} owner={self.owner_id}>"

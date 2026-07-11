@@ -9,7 +9,6 @@ automatically from the class name unless a subclass overrides it.
 from __future__ import annotations
 
 import re
-from typing import Any
 
 from sqlalchemy import MetaData
 from sqlalchemy.orm import DeclarativeBase, declared_attr
@@ -30,9 +29,6 @@ class Base(DeclarativeBase):
     """Declarative base for all ORM models."""
 
     metadata = MetaData(naming_convention=NAMING_CONVENTION)
-
-    # Allow common attribute types to be resolved by mypy/pydantic tooling.
-    type_annotation_map: dict[Any, Any] = {}
 
     @declared_attr.directive
     def __tablename__(cls) -> str:  # noqa: N805

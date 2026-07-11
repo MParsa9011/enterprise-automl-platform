@@ -29,9 +29,7 @@ class EdaService:
     def __init__(self, datasets: DatasetService) -> None:
         self._datasets = datasets
 
-    async def generate(
-        self, actor: User, dataset_id: uuid.UUID, version: int
-    ) -> dict[str, Any]:
+    async def generate(self, actor: User, dataset_id: uuid.UUID, version: int) -> dict[str, Any]:
         """Return the EDA figure bundle for a dataset version."""
         frame = await self._load_frame(actor, dataset_id, version)
         return await anyio.to_thread.run_sync(generate_eda, frame)
@@ -54,9 +52,7 @@ class EdaService:
         except (FeatureConfigError, ValueError) as exc:
             raise UnprocessableEntityError(str(exc)) from exc
 
-    async def _load_frame(
-        self, actor: User, dataset_id: uuid.UUID, version: int
-    ) -> pd.DataFrame:
+    async def _load_frame(self, actor: User, dataset_id: uuid.UUID, version: int) -> pd.DataFrame:
         """Authorize, fetch and parse a dataset version into a dataframe."""
         record, content = await self._datasets.read_content(actor, dataset_id, version)
         file_type = DatasetFileType(record.file_type)

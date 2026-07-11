@@ -9,4 +9,4 @@ dependency-inversion principle.
 from app.storage.base import Storage, StoredFile
 from app.storage.local import LocalStorage
 
-__all__ = ["Storage", "StoredFile", "LocalStorage"]
+__all__ = ["LocalStorage", "Storage", "StoredFile"]

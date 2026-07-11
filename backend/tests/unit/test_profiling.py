@@ -8,8 +8,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from app.ml.io import detect_file_type, read_tabular
 from app.core.constants import DatasetFileType
+from app.ml.io import detect_file_type, read_tabular
 from app.ml.profiling import infer_semantic_type, profile_dataframe
 
 pytestmark = pytest.mark.unit

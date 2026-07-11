@@ -43,4 +43,6 @@ class RefreshTokenRepository(BaseRepository[RefreshToken]):
             .values(revoked_at=datetime.now(UTC))
         )
         result = await self.session.execute(stmt)
-        return int(result.rowcount or 0)
+        # rowcount is present on the CursorResult returned by UPDATE/DELETE, but
+        # SQLAlchemy types execute() as the base Result which omits it.
+        return int(result.rowcount or 0)  # type: ignore[attr-defined]

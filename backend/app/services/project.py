@@ -49,16 +49,12 @@ class ProjectService:
             raise NotFoundError("Project not found.")
         return project
 
-    async def list(
-        self, actor: User, params: PageParams
-    ) -> tuple[Sequence[Project], int]:
+    async def list(self, actor: User, params: PageParams) -> tuple[Sequence[Project], int]:
         """List projects visible to the actor (own projects, or all for admin)."""
         filters = {} if actor.is_superuser else {"owner_id": actor.id}
         return await self._projects.list(params, filters=filters)
 
-    async def update(
-        self, actor: User, project_id: uuid.UUID, data: ProjectUpdate
-    ) -> Project:
+    async def update(self, actor: User, project_id: uuid.UUID, data: ProjectUpdate) -> Project:
         """Apply a partial update, regenerating the slug if the name changes."""
         project = await self.get(actor, project_id)
         changes = data.model_dump(exclude_unset=True)

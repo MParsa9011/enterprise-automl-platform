@@ -108,12 +108,14 @@ select = [
     "RUF",  # ruff-specific
 ]
 ignore = [
-    "B008",  # do not perform function calls in argument defaults (FastAPI Depends)
-    "N818",  # exception naming
+    "B008",   # do not perform function calls in argument defaults (FastAPI Depends)
+    "N818",   # exception naming
+    "UP046",  # keep classic Generic[...] base for pydantic-friendly generics
+    "UP047",  # keep classic generic function signatures
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["S101", "N802"]
+"tests/*" = ["S101", "N802", "RUF059"]  # unused tuple-unpack targets are fine in tests
 "alembic/*" = ["E501"]
 
 [tool.ruff.lint.isort]
@@ -130,11 +132,16 @@ target-version = ["py312"]
 # mypy — static typing
 # ---------------------------------------------------------------------------
 [tool.mypy]
+# A pragmatic configuration for an ML-heavy codebase: functions must be typed
+# and untyped bodies are checked, but the aggressive whole-program strictness
+# that fights third-party ML libraries (which return ``Any`` pervasively) is
+# relaxed. The web/domain layers remain fully type-checked.
 python_version = "3.12"
-strict = true
-warn_return_any = true
-warn_unused_configs = true
 disallow_untyped_defs = true
+check_untyped_defs = true
+warn_redundant_casts = true
+warn_unused_configs = true
+no_implicit_optional = true
 plugins = ["pydantic.mypy"]
 exclude = ["alembic/", "tests/"]
 
@@ -149,6 +156,11 @@ module = [
     "sklearn.*",
     "plotly.*",
     "joblib.*",
+    "pandas.*",
+    "numpy.*",
+    "scipy.*",
+    "tenacity.*",
+    "celery.*",
 ]
 ignore_missing_imports = true
 

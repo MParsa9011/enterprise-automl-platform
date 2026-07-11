@@ -21,6 +21,7 @@ from app.core.config import settings
 from app.core.constants import (
     DatasetFileType,
     ExperimentStatus,
+    NotificationType,
     RunStatus,
     TaskType,
 )
@@ -34,7 +35,6 @@ from app.models.experiment import Experiment, Run
 from app.models.user import User
 from app.repositories.dataset import DatasetVersionRepository
 from app.repositories.experiment import ExperimentRepository, RunRepository
-from app.core.constants import NotificationType
 from app.schemas.experiment import ExperimentCreate
 from app.schemas.pagination import PageParams
 from app.services.dataset import DatasetService
@@ -132,7 +132,7 @@ class ExperimentService:
         await self._experiments.update(experiment, status=ExperimentStatus.RUNNING)
         try:
             frame = await self._load_dataframe(experiment)
-        except Exception as exc:  # noqa: BLE001 - surface any load error on the experiment
+        except Exception as exc:
             logger.exception("experiment_load_failed", experiment_id=str(experiment_id))
             await self._experiments.update(
                 experiment, status=ExperimentStatus.FAILED, error_message=str(exc)
@@ -144,9 +144,9 @@ class ExperimentService:
 
         for algorithm_key in experiment.algorithms:
             run = await self._train_one(experiment, algorithm_key, frame)
-            if run.status == RunStatus.COMPLETED and run.primary_score is not None:
-                if best_score is None or run.primary_score > best_score:
-                    best_score, best_run_id = run.primary_score, run.id
+            is_better = best_score is None or (run.primary_score or 0) > best_score
+            if run.status == RunStatus.COMPLETED and run.primary_score is not None and is_better:
+                best_score, best_run_id = run.primary_score, run.id
 
         completed = best_run_id is not None
         await self._experiments.update(
@@ -217,7 +217,7 @@ class ExperimentService:
             )
         except (TrainingError, ValueError) as exc:
             return await self._fail_run(run, str(exc))
-        except Exception as exc:  # noqa: BLE001 - one algorithm failing must not abort the rest
+        except Exception as exc:
             logger.exception("run_failed", run_id=str(run.id), algorithm=algorithm_key)
             return await self._fail_run(run, str(exc))
 
@@ -344,8 +344,12 @@ class ExperimentService:
         return payload.primary_metric
 
     @staticmethod
-    def _resolve_algorithms(payload: ExperimentCreate) -> list[str]:
-        """Validate or default the algorithm set for the task."""
+    def _resolve_algorithms(payload: ExperimentCreate) -> Sequence[str]:
+        """Validate or default the algorithm set for the task.
+
+        Annotated ``Sequence`` (not ``list``) to avoid the ``list`` method on
+        this class shadowing the builtin in annotations.
+        """
         supported = available_keys(payload.task_type)
         if not payload.algorithms:
             return supported

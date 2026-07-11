@@ -39,11 +39,11 @@ class ExperimentCreate(Schema):
     test_size: float = Field(default=0.2, gt=0.0, lt=0.9)
 
     @model_validator(mode="after")
-    def _require_target_for_supervised(self) -> "ExperimentCreate":
+    def _require_target_for_supervised(self) -> ExperimentCreate:
         """Supervised tasks require a target column."""
-        if self.task_type in (TaskType.CLASSIFICATION, TaskType.REGRESSION):
-            if not self.target_column:
-                raise ValueError("target_column is required for classification/regression.")
+        supervised = (TaskType.CLASSIFICATION, TaskType.REGRESSION)
+        if self.task_type in supervised and not self.target_column:
+            raise ValueError("target_column is required for classification/regression.")
         return self
 
 
@@ -100,4 +100,3 @@ class RunExplanation(Schema):
 
     permutation_importance: dict[str, Any]
     shap: dict[str, Any] | None = None
-

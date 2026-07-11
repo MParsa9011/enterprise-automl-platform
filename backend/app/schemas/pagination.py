@@ -84,7 +84,7 @@ class Page(BaseModel, Generic[T]):
     meta: PageMeta
 
     @classmethod
-    def create(cls, items: list[T], total: int, params: PageParams) -> "Page[T]":
+    def create(cls, items: list[T], total: int, params: PageParams) -> Page[T]:
         """Build a page envelope from raw items and the requesting params."""
         return cls(
             items=items,

@@ -37,7 +37,7 @@ def read_tabular(data: bytes, file_type: DatasetFileType) -> pd.DataFrame:
             raise DataLoadError(f"Unsupported file type: {file_type}")
     except DataLoadError:
         raise
-    except Exception as exc:  # noqa: BLE001 - normalise every parser error
+    except Exception as exc:
         raise DataLoadError(f"Could not parse file as {file_type.value}: {exc}") from exc
 
     if frame.empty:

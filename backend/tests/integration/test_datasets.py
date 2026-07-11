@@ -72,9 +72,7 @@ class TestDatasetUpload:
     ) -> None:
         headers, project_id = await _setup_project(client, unique_email)
         dataset_id = (await _upload(client, headers, project_id)).json()["id"]
-        resp = await client.get(
-            f"/api/v1/datasets/{dataset_id}/versions/1", headers=headers
-        )
+        resp = await client.get(f"/api/v1/datasets/{dataset_id}/versions/1", headers=headers)
         assert resp.status_code == 200
         stats = resp.json()["statistics"]
         assert stats["overview"]["n_rows"] == 6

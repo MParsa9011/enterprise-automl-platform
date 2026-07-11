@@ -47,9 +47,7 @@ class TestProjectCrud:
         assert first.json()["slug"] == "report"
         assert second.json()["slug"] == "report-2"
 
-    async def test_list_is_paginated_and_scoped(
-        self, client: AsyncClient, seeded: None
-    ) -> None:
+    async def test_list_is_paginated_and_scoped(self, client: AsyncClient, seeded: None) -> None:
         headers = await _auth_headers(client, "owner-a@example.com")
         other = await _auth_headers(client, "owner-b@example.com")
         for i in range(3):

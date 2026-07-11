@@ -37,12 +37,12 @@ class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    roles: Mapped[list["Role"]] = relationship(
+    roles: Mapped[list[Role]] = relationship(
         secondary=user_roles,
         back_populates="users",
         lazy="selectin",
     )
-    refresh_tokens: Mapped[list["RefreshToken"]] = relationship(
+    refresh_tokens: Mapped[list[RefreshToken]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
         lazy="selectin",

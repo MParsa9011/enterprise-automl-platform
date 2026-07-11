@@ -110,9 +110,16 @@ def train_algorithm(
     params: dict[str, Any] = {}
     if optimize and algorithm.search_space is not None and effective_cv >= 2:
         params = _optimise(
-            algorithm, feature_config, frame, x_train, y_train,
-            task_type=task_type, primary_metric=primary_metric,
-            n_classes=n_classes, cv=effective_cv, n_trials=n_trials,
+            algorithm,
+            feature_config,
+            frame,
+            x_train,
+            y_train,
+            task_type=task_type,
+            primary_metric=primary_metric,
+            n_classes=n_classes,
+            cv=effective_cv,
+            n_trials=n_trials,
             random_state=random_state,
         )
 
@@ -167,7 +174,9 @@ def _split(
         _, counts = np.unique(y, return_counts=True)
         if counts.min() >= 2:
             stratify = y
-    return train_test_split(features, y, test_size=test_size, random_state=random_state, stratify=stratify)
+    return train_test_split(
+        features, y, test_size=test_size, random_state=random_state, stratify=stratify
+    )
 
 
 def _effective_cv(cv_folds: int, y_train: np.ndarray, task_type: TaskType) -> int:
@@ -217,7 +226,9 @@ def _optimise(
     def objective(trial: optuna.Trial) -> float:
         assert algorithm.search_space is not None
         trial_params = algorithm.search_space(trial, task_type)
-        pipeline = _assemble(frame, feature_config, algorithm, task_type, trial_params, random_state)
+        pipeline = _assemble(
+            frame, feature_config, algorithm, task_type, trial_params, random_state
+        )
         scores = cross_val_score(pipeline, x_train, y_train, cv=splitter, scoring=scoring, n_jobs=1)
         return float(scores.mean())
 
@@ -259,7 +270,7 @@ def _feature_schema(features: pd.DataFrame) -> list[dict[str, str]]:
 
 def load_model(artifact: bytes) -> Pipeline:
     """Deserialise a fitted pipeline previously produced by :func:`train_algorithm`."""
-    return joblib.load(BytesIO(artifact))  # noqa: S301 - trusted, self-produced artifact
+    return joblib.load(BytesIO(artifact))
 
 
 def is_error_metric(metric: str) -> bool:

@@ -71,17 +71,17 @@ def permutation_importances(
     result = permutation_importance(
         pipeline, x, y, scoring=scoring, n_repeats=n_repeats, random_state=random_state, n_jobs=1
     )
-    importances = [
+    importances: list[dict[str, Any]] = [
         {"feature": str(col), "importance": float(mean), "std": float(std)}
-        for col, mean, std in zip(x.columns, result.importances_mean, result.importances_std, strict=False)
+        for col, mean, std in zip(
+            x.columns, result.importances_mean, result.importances_std, strict=False
+        )
     ]
-    importances.sort(key=lambda item: item["importance"], reverse=True)
+    importances.sort(key=lambda item: float(item["importance"]), reverse=True)
     return importances
 
 
-def shap_importances(
-    pipeline: Pipeline, x: pd.DataFrame
-) -> list[dict[str, Any]] | None:
+def shap_importances(pipeline: Pipeline, x: pd.DataFrame) -> list[dict[str, Any]] | None:
     """Mean absolute SHAP value per transformed feature, or ``None`` if unavailable.
 
     Only attempted for tree-based models where SHAP's ``TreeExplainer`` is fast;
@@ -89,7 +89,7 @@ def shap_importances(
     """
     try:
         import shap
-    except Exception:  # noqa: BLE001 - optional dependency
+    except Exception:
         return None
 
     try:
@@ -98,25 +98,22 @@ def shap_importances(
         transformed = preprocessor.transform(x)
         try:
             names = [str(n) for n in preprocessor.get_feature_names_out()]
-        except Exception:  # noqa: BLE001
+        except Exception:
             names = [f"feature_{i}" for i in range(transformed.shape[1])]
 
         explainer = shap.TreeExplainer(model)
         values = explainer.shap_values(transformed)
         arr = np.asarray(values)
         # For multiclass, average magnitude across classes.
-        if arr.ndim == 3:
-            mean_abs = np.abs(arr).mean(axis=(0, -1))
-        else:
-            mean_abs = np.abs(arr).mean(axis=0)
+        mean_abs = np.abs(arr).mean(axis=(0, -1) if arr.ndim == 3 else 0)
 
-        pairs = [
+        pairs: list[dict[str, Any]] = [
             {"feature": name, "importance": float(val)}
             for name, val in zip(names, mean_abs, strict=False)
         ]
-        pairs.sort(key=lambda item: item["importance"], reverse=True)
+        pairs.sort(key=lambda item: float(item["importance"]), reverse=True)
         return pairs
-    except Exception as exc:  # noqa: BLE001 - SHAP is best-effort
+    except Exception as exc:
         logger.info("shap_unavailable_for_model", error=str(exc))
         return None
 

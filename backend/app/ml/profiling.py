@@ -12,7 +12,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-import numpy as np
 import pandas as pd
 from pandas.api import types as pdt
 
@@ -143,9 +142,7 @@ def profile_dataframe(frame: pd.DataFrame) -> DatasetProfile:
     total_cells = n_rows * n_columns
     missing_cells = int(frame.isna().sum().sum())
     missing_by_column = {
-        str(name): int(count)
-        for name, count in frame.isna().sum().items()
-        if int(count) > 0
+        str(name): int(count) for name, count in frame.isna().sum().items() if int(count) > 0
     }
 
     statistics: dict[str, Any] = {
@@ -155,9 +152,9 @@ def profile_dataframe(frame: pd.DataFrame) -> DatasetProfile:
             "n_duplicate_rows": int(frame.duplicated().sum()),
             "memory_bytes": int(frame.memory_usage(deep=True).sum()),
             "missing_cells": missing_cells,
-            "missing_cells_pct": round(100 * missing_cells / total_cells, 4)
-            if total_cells
-            else 0.0,
+            "missing_cells_pct": (
+                round(100 * missing_cells / total_cells, 4) if total_cells else 0.0
+            ),
             "n_numeric": len(numeric_cols),
             "n_categorical": len(categorical_cols),
         },

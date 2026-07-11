@@ -88,9 +88,7 @@ def _roc_auc(y_true: np.ndarray, y_proba: np.ndarray | None, labels: list[Any]) 
     try:
         if len(labels) == 2:
             return float(skm.roc_auc_score(y_true, y_proba[:, 1]))
-        return float(
-            skm.roc_auc_score(y_true, y_proba, multi_class="ovr", average="weighted")
-        )
+        return float(skm.roc_auc_score(y_true, y_proba, multi_class="ovr", average="weighted"))
     except ValueError:
         return None
 
@@ -179,8 +177,13 @@ def _predicted_vs_actual_figure(y_true: np.ndarray, y_pred: np.ndarray) -> dict[
     lo, hi = float(min(y_true.min(), y_pred.min())), float(max(y_true.max(), y_pred.max()))
     figure = go.Figure()
     figure.add_trace(
-        go.Scatter(x=y_true.tolist(), y=y_pred.tolist(), mode="markers", name="Predictions",
-                   marker={"opacity": 0.6})
+        go.Scatter(
+            x=y_true.tolist(),
+            y=y_pred.tolist(),
+            mode="markers",
+            name="Predictions",
+            marker={"opacity": 0.6},
+        )
     )
     figure.add_trace(
         go.Scatter(x=[lo, hi], y=[lo, hi], mode="lines", name="Ideal", line={"dash": "dash"})
@@ -230,8 +233,12 @@ def learning_curve_figure(
     train_mean = train_scores.mean(axis=1)
     val_mean = val_scores.mean(axis=1)
     figure = go.Figure()
-    figure.add_trace(go.Scatter(x=sizes.tolist(), y=train_mean.tolist(), mode="lines+markers", name="Train"))
-    figure.add_trace(go.Scatter(x=sizes.tolist(), y=val_mean.tolist(), mode="lines+markers", name="Validation"))
+    figure.add_trace(
+        go.Scatter(x=sizes.tolist(), y=train_mean.tolist(), mode="lines+markers", name="Train")
+    )
+    figure.add_trace(
+        go.Scatter(x=sizes.tolist(), y=val_mean.tolist(), mode="lines+markers", name="Validation")
+    )
     figure.update_layout(
         title="Learning curve",
         xaxis_title="Training examples",

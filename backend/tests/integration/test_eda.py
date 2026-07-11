@@ -49,9 +49,7 @@ class TestEda:
         self, client: AsyncClient, seeded: None, unique_email: str
     ) -> None:
         headers, dataset_id = await _upload_dataset(client, unique_email)
-        resp = await client.get(
-            f"/api/v1/datasets/{dataset_id}/versions/1/eda", headers=headers
-        )
+        resp = await client.get(f"/api/v1/datasets/{dataset_id}/versions/1/eda", headers=headers)
         assert resp.status_code == 200
         body = resp.json()
         assert body["correlation_heatmap"] is not None

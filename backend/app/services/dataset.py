@@ -88,9 +88,7 @@ class DatasetService:
         dataset = await self.get(actor, dataset_id)
         self._check_size(content)
         version = await self._create_version(dataset, filename=filename, content=content)
-        logger.info(
-            "dataset_version_added", dataset_id=str(dataset_id), version=version.version
-        )
+        logger.info("dataset_version_added", dataset_id=str(dataset_id), version=version.version)
         return version
 
     async def delete(self, actor: User, dataset_id: uuid.UUID) -> None:
@@ -120,9 +118,7 @@ class DatasetService:
         await self._projects.get(actor, project_id)
         return await self._datasets.list(params, filters={"project_id": project_id})
 
-    async def get_version(
-        self, actor: User, dataset_id: uuid.UUID, version: int
-    ) -> DatasetVersion:
+    async def get_version(self, actor: User, dataset_id: uuid.UUID, version: int) -> DatasetVersion:
         """Return a specific dataset version, authorizing access first."""
         await self.get(actor, dataset_id)
         record = await self._versions.get_for_dataset(dataset_id, version)

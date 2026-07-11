@@ -15,8 +15,8 @@ import os
 # application settings are imported below so the cached Settings picks it up.
 os.environ.setdefault("RUN_TRAINING_INLINE", "true")
 
-import uuid  # noqa: E402
-from collections.abc import AsyncGenerator  # noqa: E402
+import uuid
+from collections.abc import AsyncGenerator
 
 import pytest
 import pytest_asyncio

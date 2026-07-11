@@ -53,9 +53,7 @@ async def login(
     request: Request,
 ) -> TokenResponse:
     """Verify credentials and return an access/refresh token pair."""
-    _, tokens = await service.login(
-        payload.email, payload.password, client=_client(request)
-    )
+    _, tokens = await service.login(payload.email, payload.password, client=_client(request))
     return TokenResponse.model_validate(tokens.model_dump())
 
 

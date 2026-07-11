@@ -64,9 +64,7 @@ class TestLogin:
         self, client: AsyncClient, seeded: None, unique_email: str
     ) -> None:
         await _register(client, unique_email, "Passw0rd!")
-        resp = await client.post(
-            f"{API}/login", json={"email": unique_email, "password": "nope"}
-        )
+        resp = await client.post(f"{API}/login", json={"email": unique_email, "password": "nope"})
         assert resp.status_code == 401
 
     async def test_login_unknown_user(self, client: AsyncClient, seeded: None) -> None:
@@ -94,9 +92,7 @@ class TestMeAndAuthGuard:
         assert resp.json()["email"] == unique_email
 
     async def test_invalid_token_rejected(self, client: AsyncClient) -> None:
-        resp = await client.get(
-            f"{API}/me", headers={"Authorization": "Bearer not.a.jwt"}
-        )
+        resp = await client.get(f"{API}/me", headers={"Authorization": "Bearer not.a.jwt"})
         assert resp.status_code == 401
 
 
@@ -105,9 +101,7 @@ class TestRefreshRotation:
         self, client: AsyncClient, seeded: None, unique_email: str
     ) -> None:
         tokens = (await _register(client, unique_email)).json()["tokens"]
-        resp = await client.post(
-            f"{API}/refresh", json={"refresh_token": tokens["refresh_token"]}
-        )
+        resp = await client.post(f"{API}/refresh", json={"refresh_token": tokens["refresh_token"]})
         assert resp.status_code == 200
         assert resp.json()["refresh_token"] != tokens["refresh_token"]
 
@@ -127,13 +121,9 @@ class TestRefreshRotation:
         self, client: AsyncClient, seeded: None, unique_email: str
     ) -> None:
         tokens = (await _register(client, unique_email)).json()["tokens"]
-        logout = await client.post(
-            f"{API}/logout", json={"refresh_token": tokens["refresh_token"]}
-        )
+        logout = await client.post(f"{API}/logout", json={"refresh_token": tokens["refresh_token"]})
         assert logout.status_code == 204
-        resp = await client.post(
-            f"{API}/refresh", json={"refresh_token": tokens["refresh_token"]}
-        )
+        resp = await client.post(f"{API}/refresh", json={"refresh_token": tokens["refresh_token"]})
         assert resp.status_code == 401
 
 
@@ -144,8 +134,6 @@ class TestSuperuser:
         resp = await client.post(f"{API}/login", json=superuser)
         assert resp.status_code == 200
         access = resp.json()["access_token"]
-        me = await client.get(
-            f"{API}/me", headers={"Authorization": f"Bearer {access}"}
-        )
+        me = await client.get(f"{API}/me", headers={"Authorization": f"Bearer {access}"})
         assert me.json()["is_superuser"] is True
         assert any(r["name"] == "admin" for r in me.json()["roles"])

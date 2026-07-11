@@ -37,7 +37,7 @@ def log_run(
             mlflow.log_param("algorithm", algorithm)
             mlflow.log_params({k: v for k, v in params.items() if _is_scalar(v)})
             mlflow.log_metrics({k: float(v) for k, v in metrics.items() if _is_number(v)})
-    except Exception as exc:  # noqa: BLE001 - tracking must never break training
+    except Exception as exc:
         logger.info("mlflow_logging_skipped", error=str(exc))
 
 

@@ -94,6 +94,7 @@ test-results/
 .idea/
 .vscode/
 !.vscode/extensions.json
+.claude/
 *.swp
 *.swo
 .DS_Store

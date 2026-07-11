@@ -23,10 +23,12 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.pool import StaticPool
 
+from app.api.deps import get_storage
 from app.db.base import Base
 from app.db.seed import seed_roles, seed_superuser
 from app.db.session import get_db_session
 from app.main import create_app
+from app.storage import LocalStorage
 
 TEST_SUPERUSER_EMAIL = "admin@example.com"
 TEST_SUPERUSER_PASSWORD = "Admin12345!"
@@ -73,9 +75,11 @@ async def seeded(session_factory: async_sessionmaker[AsyncSession]) -> None:
 async def client(
     engine: AsyncEngine,
     session_factory: async_sessionmaker[AsyncSession],
+    tmp_path_factory: pytest.TempPathFactory,
 ) -> AsyncGenerator[AsyncClient, None]:
-    """Provide an httpx client wired to the app with an overridden DB session."""
+    """Provide an httpx client wired to the app with test DB and storage."""
     app = create_app()
+    storage_root = tmp_path_factory.mktemp("storage")
 
     async def _override_get_db() -> AsyncGenerator[AsyncSession, None]:
         async with session_factory() as session:
@@ -87,6 +91,7 @@ async def client(
                 raise
 
     app.dependency_overrides[get_db_session] = _override_get_db
+    app.dependency_overrides[get_storage] = lambda: LocalStorage(storage_root)
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://testserver") as http_client:

@@ -20,6 +20,7 @@ from uuid import UUID
 from sqlalchemy import (
     JSON,
     Boolean,
+    DateTime,
     Float,
     ForeignKey,
     Integer,
@@ -112,8 +113,8 @@ class Run(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     artifact_key: Mapped[str | None] = mapped_column(String(512), nullable=True)
     duration_seconds: Mapped[float | None] = mapped_column(Float, nullable=True)
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
-    started_at: Mapped[datetime | None] = mapped_column(nullable=True)
-    finished_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     experiment: Mapped[Experiment] = relationship(back_populates="runs")
 

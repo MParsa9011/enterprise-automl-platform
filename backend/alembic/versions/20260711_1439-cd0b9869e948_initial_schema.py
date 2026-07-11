@@ -468,8 +468,8 @@ def upgrade() -> None:
         sa.Column("artifact_key", sa.String(length=512), nullable=True),
         sa.Column("duration_seconds", sa.Float(), nullable=True),
         sa.Column("error_message", sa.Text(), nullable=True),
-        sa.Column("started_at", sa.DateTime(), nullable=True),
-        sa.Column("finished_at", sa.DateTime(), nullable=True),
+        sa.Column("started_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("finished_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("id", sa.Uuid(), nullable=False),
         sa.Column(
             "created_at",

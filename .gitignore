@@ -65,6 +65,14 @@ mlartifacts/
 /backend/storage/
 /backend/artifacts/
 
+# ---------------------------------------------------------------------------
+# Local databases
+# ---------------------------------------------------------------------------
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
 # DVC
 /data
 .dvc/cache

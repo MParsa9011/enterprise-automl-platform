@@ -27,6 +27,7 @@ from app.repositories.refresh_token import RefreshTokenRepository
 from app.repositories.user import RoleRepository, UserRepository
 from app.services.auth import AuthService
 from app.services.dataset import DatasetService
+from app.services.eda import EdaService
 from app.services.project import ProjectService
 from app.storage import LocalStorage, Storage
 
@@ -130,6 +131,14 @@ def get_dataset_service(
 
 
 DatasetServiceDep = Annotated[DatasetService, Depends(get_dataset_service)]
+
+
+def get_eda_service(datasets: DatasetServiceDep) -> EdaService:
+    """Provide an :class:`EdaService`."""
+    return EdaService(datasets)
+
+
+EdaServiceDep = Annotated[EdaService, Depends(get_eda_service)]
 
 
 # ---------------------------------------------------------------------------

@@ -90,6 +90,9 @@ class Settings(BaseSettings):
     REDIS_DB: int = 0
     CELERY_BROKER_URL: RedisDsn | None = None
     CELERY_RESULT_BACKEND: RedisDsn | None = None
+    # When true, experiments are trained inline within the request instead of
+    # being dispatched to a Celery worker. Enabled in tests; keep false in prod.
+    RUN_TRAINING_INLINE: bool = False
 
     # --- Rate limiting ---------------------------------------------------
     RATE_LIMIT_ENABLED: bool = True

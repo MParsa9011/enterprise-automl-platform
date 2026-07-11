@@ -6,9 +6,9 @@ _Last updated: 2026-07-11_
 
 | Metric | Value |
 |--------|-------|
-| Current milestone | **M5 — EDA & feature engineering** (starting) |
-| Completed milestones | M1–M4 |
-| Backend tests | 47 passing |
+| Current milestone | **M6 — AutoML training engine** (starting) |
+| Completed milestones | M1–M5 |
+| Backend tests | 57 passing |
 | Python | 3.12+ (dev venv on 3.13) |
 | Runnable | ✅ API boots; test suite green |
 
@@ -40,6 +40,14 @@ _Last updated: 2026-07-11_
 - CSV/Excel/Parquet loading; full statistical profiling engine (type inference,
   missingness, outliers (IQR), numeric/categorical summaries, correlations).
 - Upload/versioning/statistics/download endpoints.
+
+### M5 — EDA & feature engineering
+- Automated EDA engine emitting Plotly figure JSON (missing values, histograms,
+  box plots, correlation heatmap, scatter of strongest pair, category bars).
+- Declarative feature pipeline builder (`ColumnTransformer` + `Pipeline`):
+  imputation, one-hot/ordinal encoding, standard/minmax/robust scaling,
+  variance/k-best selection, optional PCA.
+- EDA + feature-preview endpoints and service; unit + integration tests.
 
 ## Architecture notes
 - Clean Architecture: `api → services → repositories → models`, with `schemas`

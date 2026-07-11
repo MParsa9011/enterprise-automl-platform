@@ -10,8 +10,8 @@ before the next begins; the project stays runnable throughout.
 | M2 | Authentication & authorization (JWT, RBAC, refresh rotation) | ✅ Done |
 | M3 | Workspace & project management | ✅ Done |
 | M4 | Dataset management (upload, versioning, statistics) | ✅ Done |
-| M5 | EDA & feature engineering pipeline | ⏳ In progress |
-| M6 | AutoML training engine (Celery, Optuna, MLflow) | ⬜ Planned |
+| M5 | EDA & feature engineering pipeline | ✅ Done |
+| M6 | AutoML training engine (Celery, Optuna, MLflow) | ⏳ In progress |
 | M7 | Model registry, prediction API, notifications, audit logs | ⬜ Planned |
 | M8 | Frontend admin dashboard (React + TS + Tailwind) | ⬜ Planned |
 | M9 | DevOps, CI/CD, docs, migrations & deployment | ⬜ Planned |

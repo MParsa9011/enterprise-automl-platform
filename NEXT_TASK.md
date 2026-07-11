@@ -1,31 +1,36 @@
 # Next Task
 
-## ▶ M5 — EDA & Feature Engineering pipeline
+## ▶ M6 — AutoML Training Engine
 
-**Goal:** Turn an uploaded dataset version into (a) automated EDA artifacts the
-frontend can render, and (b) a reproducible, configurable feature-engineering
-pipeline that later feeds the AutoML trainer.
+**Goal:** Train, tune and evaluate many models asynchronously from a dataset
+version + feature config, tracking everything for reproducibility.
 
-### Scope
-1. **EDA generation** (`app/ml/eda.py`)
-   - Missing-value summary, feature distributions/histograms, box plots,
-     scatter plots, correlation heatmap — emitted as Plotly-compatible figure
-     JSON (no server-side image rendering).
-2. **Feature engineering** (`app/ml/features.py`)
-   - scikit-learn `Pipeline` / `ColumnTransformer` builder from a declarative
-     config: imputation, encoding (one-hot / ordinal), scaling (standard /
-     minmax / robust), variance-threshold + top-k feature selection, optional PCA.
-3. **DTOs & config schemas** (`app/schemas/eda.py`, `app/schemas/features.py`).
-4. **Service** (`app/services/eda.py`) — load a dataset version, run EDA /
-   preview a feature pipeline; authorize via the dataset service.
-5. **Endpoints**
-   - `GET  /datasets/{id}/versions/{v}/eda` — EDA figures.
-   - `POST /datasets/{id}/versions/{v}/feature-preview` — apply a pipeline config
-     and return the transformed schema + a sample.
-6. **Tests** — unit tests for EDA/feature builders; integration tests for endpoints.
+### Scope (delivered as vertical slices)
+1. **Domain models** — `Experiment`, `Run`, `Model` (+ statuses already in
+   `constants.py`). An experiment fans out into one run per algorithm; the best
+   run is registered as a `Model`.
+2. **Algorithm registry** (`app/ml/algorithms.py`) — a registry of estimators
+   with default hyper-parameters and Optuna search spaces:
+   Random Forest, XGBoost, CatBoost, LightGBM, Logistic Regression, SVM, KNN,
+   Naive Bayes, Decision Tree, Extra Trees, Gradient Boosting.
+3. **Evaluation** (`app/ml/evaluation.py`) — classification & regression metrics,
+   ROC/confusion-matrix/learning-curve figure data.
+4. **Training pipeline** (`app/ml/training.py`) — assemble preprocessing +
+   estimator, cross-validate, optional Optuna HPO, fit final model, persist
+   artifact + metrics.
+5. **Async execution** — Celery app + training task; experiment/run status
+   transitions; graceful eager-mode fallback for tests.
+6. **Service + endpoints** — create experiment, list/get experiments & runs,
+   fetch metrics/evaluation figures.
+7. **Tests** — algorithm registry, evaluation math, and an end-to-end training
+   run executed synchronously (Celery eager) on a small dataset.
 
 ### Definition of done
-- New endpoints wired, permission-guarded (`dataset:read`).
-- Unit + integration tests green; full suite still passing.
-- Atomic Conventional Commits per sub-feature.
-- `PROJECT_STATUS.md` and this file updated; roadmap row flipped to ✅.
+- Experiments can be created and (in eager mode) trained end-to-end.
+- Metrics + evaluation figures retrievable via API.
+- Unit + integration tests green; full suite passing.
+- Atomic Conventional Commits; `PROJECT_STATUS.md` + this file updated.
+
+> MLflow tracking and SHAP explainability are integrated in this milestone where
+> feasible; heavier boosting libraries (XGBoost/LightGBM/CatBoost) are optional
+> extras and the registry degrades gracefully if one is unavailable.

@@ -1,6 +1,15 @@
 # Deployment
 
-The reference deployment is the Docker Compose stack in `docker-compose.yml`.
+The reference deployment is the Docker Compose stack in `docker-compose.yml`, with
+a hardened production override in `docker-compose.prod.yml`:
+
+```bash
+# Development-style (all ports published)
+docker compose up -d --build
+
+# Production (internal services not exposed, ENVIRONMENT=production, restart=always)
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+```
 
 ## Services
 

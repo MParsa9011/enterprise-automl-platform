@@ -1,0 +1,42 @@
+# =============================================================================
+# Production override for docker-compose.yml.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Hardens the base stack for production: internal services are not published to
+# the host, the environment is forced to `production` (docs disabled, HSTS on),
+# and services always restart. Put real secrets in `.env` (never commit it).
+# =============================================================================
+
+services:
+  db:
+    restart: always
+    ports: [] # do not expose the database to the host
+
+  redis:
+    restart: always
+    ports: [] # do not expose Redis to the host
+
+  mlflow:
+    restart: always
+    # Publish MLflow only if you intend to expose it; otherwise keep it internal.
+    ports: []
+
+  api:
+    restart: always
+    environment:
+      ENVIRONMENT: production
+      DEBUG: "false"
+      LOG_JSON: "true"
+    # The frontend/Nginx is the public entrypoint; the API stays internal.
+    ports: []
+
+  worker:
+    restart: always
+    environment:
+      ENVIRONMENT: production
+
+  frontend:
+    restart: always
+    ports:
+      - "80:80" # public entrypoint (terminate TLS at an upstream proxy/ingress)

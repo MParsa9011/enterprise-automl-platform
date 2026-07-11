@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Questions & discussions
+    url: https://github.com/your-org/enterprise-automl-platform/discussions
+    about: Ask questions and discuss ideas with the community.
+  - name: 🔒 Report a security vulnerability
+    url: https://github.com/your-org/enterprise-automl-platform/security/policy
+    about: Please report security issues privately (see SECURITY.md).

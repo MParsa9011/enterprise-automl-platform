@@ -102,6 +102,10 @@ class Run(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     params: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
     metrics: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
     figures: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    # Input contract for serving: the feature columns the model expects and, for
+    # classifiers, the ordered class labels the encoded predictions map back to.
+    feature_schema: Mapped[list[dict[str, str]]] = mapped_column(JSON, default=list)
+    class_names: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
     # Primary metric value, denormalised for cheap ranking/sorting of runs.
     primary_score: Mapped[float | None] = mapped_column(Float, nullable=True, index=True)
 

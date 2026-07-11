@@ -6,9 +6,9 @@ _Last updated: 2026-07-11_
 
 | Metric | Value |
 |--------|-------|
-| Current milestone | **M7 — Model registry, prediction, notifications, audit** (starting) |
-| Completed milestones | M1–M6 |
-| Backend tests | 79 passing |
+| Current milestone | **M8 — Frontend admin dashboard** (starting) |
+| Completed milestones | M1–M7 |
+| Backend tests | 82 passing |
 | Python | 3.12+ (dev venv on 3.13) |
 | Runnable | ✅ API boots; test suite green |
 
@@ -58,6 +58,21 @@ _Last updated: 2026-07-11_
 - Async execution via Celery (inline mode for tests); best-run selection.
 - Explainability: permutation importance (always) + SHAP (tree models).
 - Optional, opt-in MLflow tracking.
+
+### M7 — Registry, prediction, notifications, audit
+- `Model` registry: promote a run → versioned model; deploy/stage lifecycle
+  (single production model per name); list/get/compare/delete.
+- Prediction API: JSON records validated against the model's feature schema and
+  served through the persisted pipeline (labels + class probabilities).
+- Notifications: emitted on experiment completion and model deployment; list,
+  unread count, mark-read.
+- Audit logs: middleware records every mutating request (actor/action/resource/
+  status/ip); admin-only listing.
+
+### Testing infrastructure
+- Test suite runs on a file-backed SQLite database so components that open their
+  own session (audit middleware) get an independent connection, mirroring the
+  production connection pool.
 
 ## Architecture notes
 - Clean Architecture: `api → services → repositories → models`, with `schemas`

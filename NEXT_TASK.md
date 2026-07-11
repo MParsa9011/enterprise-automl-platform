@@ -1,31 +1,31 @@
 # Next Task
 
-## ▶ M7 — Model Registry, Prediction, Notifications, Audit
+## ▶ M8 — Frontend Admin Dashboard
 
-**Goal:** Promote trained runs into a versioned model registry, serve predictions
-from deployed models, notify users of events, and record an audit trail.
+**Goal:** A modern, responsive React + TypeScript admin dashboard for the
+platform, wired to the v1 API with authenticated data fetching, dark mode and
+proper loading/error states.
+
+### Stack
+Vite + React 18 + TypeScript + TailwindCSS + TanStack Query + React Router +
+React Hook Form + Axios + Recharts (for Plotly-free chart rendering of summary
+data; raw Plotly figure JSON from the API can be embedded where needed).
 
 ### Scope (delivered as vertical slices)
-1. **Model registry** (`Model` model + repo + service)
-   - Register a completed run as a versioned `Model` in a project.
-   - Stages: none → staging → production → archived (deploy = promote to
-     production, demoting the previous production model).
-   - List, get, compare models (metrics side-by-side), delete.
-2. **Prediction API**
-   - `POST /models/{id}/predict` — validate a JSON payload against the model's
-     feature schema, run the persisted pipeline, return predictions (+ class
-     probabilities for classifiers).
-3. **Notifications**
-   - `Notification` model + repo + service; list, unread count, mark-read.
-   - Emitted on experiment completion and model deployment.
-4. **Audit logs**
-   - `AuditLog` model + service + middleware capturing mutating requests
-     (actor, action, resource, status, ip). Admin-only listing endpoint.
-5. **Tests** — registry promotion & compare, prediction round-trip, notification
-   lifecycle, audit-log capture.
+1. **Tooling & scaffold** — Vite project, Tailwind, ESLint/Prettier, tsconfig,
+   env config, path aliases.
+2. **API layer** — typed Axios client with access-token attach + refresh-token
+   rotation interceptor; generated-style TS types mirroring the DTOs.
+3. **Auth** — login/register pages, auth context, protected routes, token store.
+4. **App shell** — responsive sidebar + topbar, dark-mode toggle (persisted),
+   notification bell (unread count), user menu.
+5. **Pages** — Dashboard (KPIs), Projects (list/create), Datasets (upload +
+   statistics), Experiments (create + runs + metrics/figures), Model registry
+   (list/deploy/compare + predict form).
+6. **UX** — TanStack Query loading/error/empty states, toasts, skeletons.
+7. **Quality** — TypeScript strict, ESLint clean; a couple of component tests.
 
 ### Definition of done
-- Deployed model serves predictions from JSON.
-- Notifications and audit entries recorded and queryable.
-- Unit + integration tests green; full suite passing.
+- `npm run dev` serves the dashboard; `npm run build` succeeds; `tsc` clean.
+- Auth flow works against the API; core pages render live data.
 - Atomic Conventional Commits; `PROJECT_STATUS.md` + this file updated.

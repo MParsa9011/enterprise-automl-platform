@@ -11,8 +11,8 @@ before the next begins; the project stays runnable throughout.
 | M3 | Workspace & project management | ✅ Done |
 | M4 | Dataset management (upload, versioning, statistics) | ✅ Done |
 | M5 | EDA & feature engineering pipeline | ✅ Done |
-| M6 | AutoML training engine (Celery, Optuna, MLflow) | ⏳ In progress |
-| M7 | Model registry, prediction API, notifications, audit logs | ⬜ Planned |
+| M6 | AutoML training engine (Celery, Optuna, MLflow) | ✅ Done |
+| M7 | Model registry, prediction API, notifications, audit logs | ⏳ In progress |
 | M8 | Frontend admin dashboard (React + TS + Tailwind) | ⬜ Planned |
 | M9 | DevOps, CI/CD, docs, migrations & deployment | ⬜ Planned |
 

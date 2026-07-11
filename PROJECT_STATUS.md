@@ -6,9 +6,9 @@ _Last updated: 2026-07-11_
 
 | Metric | Value |
 |--------|-------|
-| Current milestone | **M6 — AutoML training engine** (starting) |
-| Completed milestones | M1–M5 |
-| Backend tests | 57 passing |
+| Current milestone | **M7 — Model registry, prediction, notifications, audit** (starting) |
+| Completed milestones | M1–M6 |
+| Backend tests | 79 passing |
 | Python | 3.12+ (dev venv on 3.13) |
 | Runnable | ✅ API boots; test suite green |
 
@@ -48,6 +48,16 @@ _Last updated: 2026-07-11_
   imputation, one-hot/ordinal encoding, standard/minmax/robust scaling,
   variance/k-best selection, optional PCA.
 - EDA + feature-preview endpoints and service; unit + integration tests.
+
+### M6 — AutoML training engine
+- `Experiment` + `Run` models; algorithm registry of 11 estimators with graceful
+  degradation for optional native libs (XGBoost/LightGBM/CatBoost).
+- Training pipeline: preprocessing + estimator, train/test split, Optuna HPO via
+  cross-validation, evaluation (classification & regression metrics + ROC /
+  confusion-matrix / residual figures), joblib artifact persistence.
+- Async execution via Celery (inline mode for tests); best-run selection.
+- Explainability: permutation importance (always) + SHAP (tree models).
+- Optional, opt-in MLflow tracking.
 
 ## Architecture notes
 - Clean Architecture: `api → services → repositories → models`, with `schemas`

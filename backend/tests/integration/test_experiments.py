@@ -102,6 +102,39 @@ class TestExperimentLifecycle:
         assert detail.status_code == 200
         assert "confusion_matrix" in detail.json()["figures"]
 
+    async def test_run_explainability(
+        self, client: AsyncClient, seeded: None, unique_email: str
+    ) -> None:
+        headers, project_id, dataset_id = await _prepare(client, unique_email)
+        exp = await client.post(
+            f"{PROJECTS}/{project_id}/experiments",
+            headers=headers,
+            json={
+                "name": "Explain",
+                "dataset_id": dataset_id,
+                "task_type": "classification",
+                "target_column": "target",
+                "algorithms": ["random_forest"],
+                "cv_folds": 2,
+            },
+        )
+        experiment = exp.json()
+        run_id = experiment["runs"][0]["id"]
+        resp = await client.get(
+            f"/api/v1/experiments/{experiment['id']}/runs/{run_id}/explain",
+            headers=headers,
+        )
+        assert resp.status_code == 200
+        body = resp.json()
+        assert "values" in body["permutation_importance"]
+        assert "figure" in body["permutation_importance"]
+        # Every raw feature has an importance entry.
+        assert {v["feature"] for v in body["permutation_importance"]["values"]} == {
+            "x1",
+            "x2",
+            "x3",
+        }
+
     async def test_list_experiments(
         self, client: AsyncClient, seeded: None, unique_email: str
     ) -> None:

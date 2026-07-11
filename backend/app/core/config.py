@@ -67,6 +67,10 @@ class Settings(BaseSettings):
     # collaborators are assigned the "viewer" role by an administrator.
     DEFAULT_USER_ROLE: str = "data_scientist"
 
+    # Bootstrap superuser seeded on first startup (see app.db.init_db).
+    FIRST_SUPERUSER_EMAIL: str = "admin@automl.local"
+    FIRST_SUPERUSER_PASSWORD: str = "ChangeMe123!"
+
     # --- CORS ------------------------------------------------------------
     # ``NoDecode`` disables pydantic-settings' implicit JSON decoding so the
     # ``_split_csv`` validator can accept a plain comma-separated string.

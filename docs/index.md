@@ -33,5 +33,5 @@ them, and serve predictions through a versioned model registry.
 - [Database (ER)](database.md) — the relational schema
 - [Installation](installation.md) — run it locally
 - [Deployment](deployment.md) — the Docker Compose stack
-- [Developer Guide](developer-guide.md) — conventions and workflows
+- [Developer Guide](development.md) — conventions and workflows
 - [API Reference](api.md) — endpoint overview

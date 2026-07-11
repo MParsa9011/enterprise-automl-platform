@@ -14,7 +14,7 @@ cd frontend && npm install
 ## Workflow
 
 1. Branch from `main`.
-2. Make a focused change following the [Developer Guide](docs/developer-guide.md)
+2. Make a focused change following the [Developer Guide](docs/development.md)
    (vertical slice: model → repository → service → schema → endpoint → tests).
 3. Run the quality gates locally (they must pass — CI enforces them):
 

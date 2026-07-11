@@ -42,7 +42,11 @@ nav:
   - Home: index.md
   - Architecture: architecture.md
   - Database (ER): database.md
+  - Backend: backend.md
+  - Frontend: frontend.md
   - Installation: installation.md
   - Deployment: deployment.md
-  - Developer Guide: developer-guide.md
+  - Development: development.md
+  - Coding Standards: coding-standards.md
+  - Contributing: contributing.md
   - API Reference: api.md

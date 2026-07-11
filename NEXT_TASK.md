@@ -21,4 +21,4 @@ docker compose up -d --build   # full stack
 - Real-time training progress via WebSockets.
 - Per-project collaborator roles (sharing beyond ownership).
 
-Pick one and start a new vertical slice per the [Developer Guide](docs/developer-guide.md).
+Pick one and start a new vertical slice per the [Developer Guide](docs/development.md).

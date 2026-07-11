@@ -49,7 +49,11 @@ PERMISSIONS: tuple[PermissionSpec, ...] = (
 )
 
 _ALL = {spec.name for spec in PERMISSIONS}
-_READ_ONLY = {spec.name for spec in PERMISSIONS if spec.action == "read"}
+# General read access, excluding sensitive reads (audit logs) which are granted
+# only to elevated roles.
+_READ_ONLY = {
+    spec.name for spec in PERMISSIONS if spec.action == "read" and spec.resource != "audit"
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -81,6 +85,7 @@ ROLES: tuple[RoleSpec, ...] = (
                 "dataset:create",
                 "experiment:create",
                 "user:manage",
+                "audit:read",
             }
         ),
     ),

@@ -68,7 +68,9 @@ class Settings(BaseSettings):
     DEFAULT_USER_ROLE: str = "data_scientist"
 
     # Bootstrap superuser seeded on first startup (see app.db.init_db).
-    FIRST_SUPERUSER_EMAIL: str = "admin@automl.local"
+    # NB: uses a real TLD (not `.local`), which the login endpoint's email
+    # validation would otherwise reject, locking out the bootstrap admin.
+    FIRST_SUPERUSER_EMAIL: str = "admin@automl.io"
     FIRST_SUPERUSER_PASSWORD: str = "ChangeMe123!"
 
     # --- CORS ------------------------------------------------------------

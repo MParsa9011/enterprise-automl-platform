@@ -6,11 +6,13 @@ _Last updated: 2026-07-11_
 
 | Metric | Value |
 |--------|-------|
-| Current milestone | **M8 — Frontend admin dashboard** (starting) |
-| Completed milestones | M1–M7 |
+| Current milestone | **M9 — DevOps, CI/CD, docs & deployment** (starting) |
+| Completed milestones | M1–M8 |
 | Backend tests | 82 passing |
+| Frontend tests | 5 passing (build + typecheck clean) |
 | Python | 3.12+ (dev venv on 3.13) |
-| Runnable | ✅ API boots; test suite green |
+| Node | 26 |
+| Runnable | ✅ API boots; frontend renders; suites green |
 
 ## Completed
 
@@ -68,6 +70,18 @@ _Last updated: 2026-07-11_
   unread count, mark-read.
 - Audit logs: middleware records every mutating request (actor/action/resource/
   status/ip); admin-only listing.
+
+### M8 — Frontend admin dashboard
+- Vite + React 18 + TypeScript (strict) + Tailwind + TanStack Query + React Router
+  + React Hook Form.
+- Typed Axios client with access-token attach and transparent refresh-token
+  rotation interceptor; auth context with protected routes.
+- App shell (responsive sidebar/topbar), persisted dark mode, notification bell.
+- Pages: Login/Register, Dashboard, Projects, Datasets (upload + statistics),
+  Experiments (create + runs + register), Models (deploy + predict).
+- Loading/error/empty states throughout; Vitest unit + component tests.
+- `npm run build`, `tsc --noEmit`, and `vitest` all pass; verified rendering in
+  light and dark themes.
 
 ### Testing infrastructure
 - Test suite runs on a file-backed SQLite database so components that open their

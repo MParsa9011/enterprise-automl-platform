@@ -187,9 +187,12 @@ def get_experiment_service(
     datasets: DatasetServiceDep,
     projects: ProjectServiceDep,
     storage: StorageDep,
+    notifications: NotificationServiceDep,
 ) -> ExperimentService:
     """Provide a fully-wired :class:`ExperimentService`."""
-    return ExperimentService(experiments, runs, dataset_versions, datasets, projects, storage)
+    return ExperimentService(
+        experiments, runs, dataset_versions, datasets, projects, storage, notifications
+    )
 
 
 ExperimentServiceDep = Annotated[ExperimentService, Depends(get_experiment_service)]

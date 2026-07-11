@@ -78,6 +78,26 @@ class TestExperimentLifecycle:
         best = next(r for r in body["runs"] if r["id"] == body["best_run_id"])
         assert "accuracy" in best["metrics"]
 
+    async def test_completion_emits_notification(
+        self, client: AsyncClient, seeded: None, unique_email: str
+    ) -> None:
+        headers, project_id, dataset_id = await _prepare(client, unique_email)
+        await client.post(
+            f"{PROJECTS}/{project_id}/experiments",
+            headers=headers,
+            json={
+                "name": "Notify",
+                "dataset_id": dataset_id,
+                "task_type": "classification",
+                "target_column": "target",
+                "algorithms": ["decision_tree"],
+                "cv_folds": 2,
+            },
+        )
+        notifs = await client.get("/api/v1/notifications", headers=headers)
+        titles = [n["title"] for n in notifs.json()["items"]]
+        assert "Experiment finished" in titles
+
     async def test_run_detail_includes_figures(
         self, client: AsyncClient, seeded: None, unique_email: str
     ) -> None:

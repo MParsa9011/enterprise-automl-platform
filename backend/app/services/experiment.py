@@ -34,9 +34,11 @@ from app.models.experiment import Experiment, Run
 from app.models.user import User
 from app.repositories.dataset import DatasetVersionRepository
 from app.repositories.experiment import ExperimentRepository, RunRepository
+from app.core.constants import NotificationType
 from app.schemas.experiment import ExperimentCreate
 from app.schemas.pagination import PageParams
 from app.services.dataset import DatasetService
+from app.services.notification import NotificationService
 from app.services.project import ProjectService
 from app.storage.base import Storage
 
@@ -54,6 +56,7 @@ class ExperimentService:
         datasets: DatasetService,
         projects: ProjectService,
         storage: Storage,
+        notifications: NotificationService,
     ) -> None:
         self._experiments = experiments
         self._runs = runs
@@ -61,6 +64,7 @@ class ExperimentService:
         self._datasets = datasets
         self._projects = projects
         self._storage = storage
+        self._notifications = notifications
 
     # ------------------------------------------------------------------
     # Create & launch
@@ -151,10 +155,28 @@ class ExperimentService:
             best_run_id=best_run_id,
             error_message=None if completed else "All training runs failed.",
         )
+        await self._notify_finished(experiment, completed)
         logger.info(
             "experiment_finished",
             experiment_id=str(experiment_id),
             best_run_id=str(best_run_id) if best_run_id else None,
+        )
+
+    async def _notify_finished(self, experiment: Experiment, completed: bool) -> None:
+        """Notify the experiment's owner that training has finished."""
+        if experiment.created_by is None:
+            return
+        await self._notifications.create(
+            experiment.created_by,
+            type=NotificationType.SUCCESS if completed else NotificationType.ERROR,
+            title="Experiment finished" if completed else "Experiment failed",
+            message=(
+                f"'{experiment.name}' completed training."
+                if completed
+                else f"'{experiment.name}' failed to produce a model."
+            ),
+            link=f"/experiments/{experiment.id}",
+            meta={"experiment_id": str(experiment.id)},
         )
 
     async def _train_one(self, experiment: Experiment, algorithm_key: str, frame: object) -> Run:

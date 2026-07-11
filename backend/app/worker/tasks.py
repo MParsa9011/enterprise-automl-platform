@@ -22,13 +22,15 @@ logger = get_logger(__name__)
 
 def _build_service(session: AsyncSession) -> ExperimentService:
     """Assemble an :class:`ExperimentService` bound to ``session``."""
+    from app.core.config import settings
     from app.repositories.dataset import DatasetRepository, DatasetVersionRepository
     from app.repositories.experiment import ExperimentRepository, RunRepository
+    from app.repositories.notification import NotificationRepository
     from app.repositories.project import ProjectRepository
     from app.services.dataset import DatasetService
+    from app.services.notification import NotificationService
     from app.services.project import ProjectService
     from app.storage import LocalStorage
-    from app.core.config import settings
 
     projects = ProjectService(ProjectRepository(session))
     storage = LocalStorage(settings.STORAGE_ROOT)
@@ -38,6 +40,7 @@ def _build_service(session: AsyncSession) -> ExperimentService:
         storage,
         projects,
     )
+    notifications = NotificationService(NotificationRepository(session))
     return ExperimentService(
         ExperimentRepository(session),
         RunRepository(session),
@@ -45,6 +48,7 @@ def _build_service(session: AsyncSession) -> ExperimentService:
         datasets,
         projects,
         storage,
+        notifications,
     )
 
 

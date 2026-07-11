@@ -12,6 +12,11 @@ import asyncio
 
 from app.core.config import settings
 from app.core.logging import configure_logging, get_logger
+
+# Import the aggregated metadata so *every* model is registered before the ORM
+# is used; otherwise string-based relationships (e.g. User -> RefreshToken) fail
+# to resolve when the mapper configures.
+from app.db import base as _base  # noqa: F401
 from app.db.seed import seed_roles, seed_superuser
 from app.db.session import AsyncSessionFactory, dispose_engine
 

@@ -26,6 +26,11 @@ from app.api.middleware import (
 from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.logging import configure_logging, get_logger
+
+# Import the model aggregator for its side effect: registering every ORM model on
+# the mapper registry. Without this, string-based relationships (e.g. Role ->
+# Permission) fail to resolve on the first request that triggers mapper config.
+from app.db import base as _models  # noqa: F401
 from app.db.session import AsyncSessionFactory, dispose_engine
 
 logger = get_logger(__name__)

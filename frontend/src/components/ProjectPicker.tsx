@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 import { EmptyState } from "@/components/ui/StateViews";
 import { useProjects } from "@/hooks/useProjects";
@@ -15,7 +15,7 @@ export function ProjectPicker({
   onChange: (id: string) => void;
 }) {
   const { data } = useProjects(1, 100);
-  const projects = data?.items ?? [];
+  const projects = useMemo(() => data?.items ?? [], [data]);
 
   useEffect(() => {
     if (!projectId && projects.length > 0) {

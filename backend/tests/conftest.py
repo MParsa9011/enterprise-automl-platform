@@ -9,8 +9,14 @@ test client and helper fixtures observe the same data. The application's
 
 from __future__ import annotations
 
-import uuid
-from collections.abc import AsyncGenerator
+import os
+
+# Train experiments inline (no Celery/Redis) during tests. Must be set before the
+# application settings are imported below so the cached Settings picks it up.
+os.environ.setdefault("RUN_TRAINING_INLINE", "true")
+
+import uuid  # noqa: E402
+from collections.abc import AsyncGenerator  # noqa: E402
 
 import pytest
 import pytest_asyncio

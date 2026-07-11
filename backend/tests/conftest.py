@@ -27,7 +27,6 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
-from sqlalchemy.pool import StaticPool
 
 from app.api.deps import get_storage
 from app.db.base import Base
@@ -41,12 +40,17 @@ TEST_SUPERUSER_PASSWORD = "Admin12345!"
 
 
 @pytest_asyncio.fixture
-async def engine() -> AsyncGenerator[AsyncEngine, None]:
-    """Provide an in-memory SQLite engine with the full schema created."""
+async def engine(tmp_path_factory: pytest.TempPathFactory) -> AsyncGenerator[AsyncEngine, None]:
+    """Provide a file-backed SQLite engine with the full schema created.
+
+    A temporary *file* (not ``:memory:``) is used so that components which open
+    their own session — notably the audit middleware — get an independent
+    connection to the same database, mirroring production's connection pool.
+    """
+    db_path = tmp_path_factory.mktemp("db") / "test.db"
     engine = create_async_engine(
-        "sqlite+aiosqlite://",
-        poolclass=StaticPool,
-        connect_args={"check_same_thread": False},
+        f"sqlite+aiosqlite:///{db_path}",
+        connect_args={"check_same_thread": False, "timeout": 30},
     )
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -98,6 +102,8 @@ async def client(
 
     app.dependency_overrides[get_db_session] = _override_get_db
     app.dependency_overrides[get_storage] = lambda: LocalStorage(storage_root)
+    # Point session-less components (audit middleware) at the test database.
+    app.state.session_factory = session_factory
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://testserver") as http_client:
